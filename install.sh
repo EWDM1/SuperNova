@@ -58,6 +58,12 @@ else
     echo "✅ Ollama ya está instalado."
 fi
 
+# Instalar portaudio (dependencia de sonido para macOS)
+if [[ "$OSTYPE" == "darwin"* ]] && ! brew list portaudio &>/dev/null; then
+    echo "🔧 Instalando portaudio (audio macOS)..."
+    brew install portaudio
+fi
+
 # 6. Instalar Python 3.11+
 if ! command -v python3 &> /dev/null || ! python3 -c "import sys; exit(0 if sys.version_info >= (3, 11) else 1)" 2>/dev/null; then
     echo "🐍 Instalando Python 3.11+..."
