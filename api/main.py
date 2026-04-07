@@ -10,8 +10,11 @@ sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")
 
 try:
     from core.agent import run_agent
-except ImportError:
-    run_agent = lambda q, h: "⚠️ Módulo 'core/agent.py' no encontrado. Ejecuta ./install.sh primero."
+    # 🔧 NUEVO: Importar el router del Doctor Bot
+    from api.doctor import router as doctor_router
+except ImportError as e:
+    run_agent = lambda q, h: f"⚠️ Error de importación: {e}"
+    doctor_router = None
 
 app = FastAPI(
     title="🌟 SuperNova API",
@@ -28,6 +31,10 @@ class ChatResponse(BaseModel):
     response: str
     status: str = "success"
 
+# 🔧 NUEVO: Montar el router del Doctor Bot en la app principal
+if doctor_router:
+    app.include_router(doctor_router)
+
 # 🏥 Endpoint de verificación
 @app.get("/health")
 def health_check():
@@ -43,7 +50,6 @@ def chat_endpoint(request: ChatRequest):
         response_text = run_agent(request.query, request.history)
         return ChatResponse(response=response_text)
     except Exception as e:
-        # En producción se loguea, aquí se devuelve mensaje claro
         raise HTTPException(status_code=500, detail=f"Error al procesar: {str(e)}")
 
 # 🚀 Ejecución local (solo para pruebas manuales)
