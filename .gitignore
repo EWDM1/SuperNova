@@ -1,0 +1,38 @@
+# 🐍 Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+*.egg
+*.egg-info/
+dist/
+build/
+venv/
+.env
+
+# 🍎 macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+._*
+
+# 🤖 IA / Modelos Locales (se descargan con install.sh)
+.ollama/
+models/
+*.gguf
+
+# 📊 Logs & Backups Locales
+logs/
+*.log
+backups/
+*.db
+chroma.sqlite3
+
+# 🛠️ IDE & Config
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# 📦 Docker (opcional, pero bueno tenerlo)
+.docker/
