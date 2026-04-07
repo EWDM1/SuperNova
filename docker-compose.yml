@@ -1,0 +1,35 @@
+version: '3.8'
+
+services:
+  # 🧠 Motor de IA Local (Ollama)
+  ollama:
+    image: ollama/ollama:latest
+    container_name: supernova-ollama
+    volumes:
+      - ollama_data:/root/.ollama
+    ports:
+      - "11434:11434"
+    restart: unless-stopped
+    # En Mac Studio (Apple Silicon) Docker usa aceleración nativa automáticamente
+
+  # 🤖 Aplicación SuperNova
+  supernova:
+    build: .
+    container_name: supernova-app
+    environment:
+      - OLLAMA_BASE_URL=http://ollama:11434
+      - PYTHONUNBUFFERED=1
+      - TZ=America/Panama
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./backups:/app/backups
+      - ./memory:/app/memory
+      - ./config:/app/config
+    depends_on:
+      - ollama
+    restart: unless-stopped
+    command: uvicorn api.main:app --host 0.0.0.0 --port 8000
+
+volumes:
+  ollama_data:
