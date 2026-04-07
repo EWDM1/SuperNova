@@ -518,7 +518,35 @@
     voiceBtn.addEventListener('click', () => { if (voiceBtn.classList.contains('unsupported')) return; if (isListening) recognition.stop(); else { recognition.lang = currentLang === 'es' ? 'es-ES' : 'en-US'; input.value = ''; try { recognition.start(); } catch(e) {} } });
     window.recognition = recognition;
   }
-
+  // 🎙️ Wake Word Polling & Auto-Activation
+  let wakeTriggered = false;
+  async function checkWakeStatus() {
+    try {
+      const res = await fetch('/wake/status');
+      const data = await res.json();
+      if (data.triggered && !wakeTriggered) {
+        wakeTriggered = true;
+        // Sonido sutil de activación
+        const ctx = new (window.AudioContext || window.webkitAudioContext)();
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.connect(gain); gain.connect(ctx.destination);
+        osc.frequency.value = 880; gain.gain.value = 0.1;
+        osc.start(); gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.4);
+        osc.stop(ctx.currentTime + 0.4);
+        
+        // Activar micrófono automáticamente
+        document.getElementById('user-input').placeholder = '👂 Escuchando...';
+        document.getElementById('user-input').focus();
+        if (voiceBtn && !voiceBtn.classList.contains('listening')) {
+          voiceBtn.click(); // Activa el micrófono existente
+        }
+        setTimeout(() => wakeTriggered = false, 3000);
+      }
+    } catch {}
+  }
+  setInterval(checkWakeStatus, 800);
+  
   // ── Init ──────────────────────────────────────────────────────────
   applyLang();
 </script>
