@@ -11,9 +11,11 @@ sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")
 try:
     from core.agent import run_agent
     from api.doctor import router as doctor_router
+    from api.wake import router as wake_router  # 🆕 NUEVO
 except ImportError as e:
     run_agent = lambda q, h: f"⚠️ Error de importación: {e}"
     doctor_router = None
+    wake_router = None
 
 app = FastAPI(
     title="🌟 SuperNova API",
@@ -21,7 +23,6 @@ app = FastAPI(
     version="1.0.0"
 )
 
-# 🌐 NUEVO: Servir el Dashboard
 app.mount("/dashboard", StaticFiles(directory="static", html=True), name="dashboard")
 
 class ChatRequest(BaseModel):
@@ -32,8 +33,8 @@ class ChatResponse(BaseModel):
     response: str
     status: str = "success"
 
-if doctor_router:
-    app.include_router(doctor_router)
+if doctor_router: app.include_router(doctor_router)
+if wake_router: app.include_router(wake_router)  # 🆕 NUEVO
 
 @app.get("/health")
 def health_check():
