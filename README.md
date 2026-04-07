@@ -16,7 +16,7 @@ SuperNova es tu asistente de inteligencia artificial personal, diseñado para ac
 
 ---
 
-## 🚀 Instalación Rápida (para cuando tengas tu Mac Studio)
+## 🚀 Instalación Rápida
 
 ### Requisitos:
 - macOS (Apple Silicon M1/M2/M3 recomendado)
