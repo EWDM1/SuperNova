@@ -1,0 +1,36 @@
+[build-system]
+requires = ["setuptools>=68.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "supernova"
+version = "1.0.0"
+description = "Asistente IA personal tipo COO para macOS"
+readme = "README.md"
+license = {text = "MIT"}
+requires-python = ">=3.11"
+authors = [
+    {name = "EWDM1", email = "tu-email@ejemplo.com"}
+]
+dependencies = [
+    "langchain>=0.1.0",
+    "langchain-community>=0.0.30",
+    "langchain-ollama>=0.1.0",
+    "ollama>=0.1.6",
+    "fastapi>=0.110.0",
+    "uvicorn>=0.27.0",
+    "chromadb>=0.4.24",
+    "typer>=0.12.0",
+    "python-dotenv>=1.0.0",
+    "pydantic>=2.6.0",
+    "pydantic-settings>=2.2.0",
+    "python-docx>=1.1.0",
+    "openpyxl>=3.1.0",
+    "pypdf>=4.0.0"
+]
+
+[project.scripts]
+supernova = "cli.main:app"
+
+[tool.setuptools]
+packages = ["core", "core.tools", "api", "cli", "config"]
