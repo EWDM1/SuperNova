@@ -8,6 +8,9 @@ from langchain_core.tools import tool
 import chromadb
 from langchain_ollama import OllamaEmbeddings
 
+# 🔧 NUEVO: Importar herramientas del Doctor Bot
+from core.tools.doctor import doctor_diagnose
+
 # ==========================================
 # 🧠 CONFIGURACIÓN DE MEMORIA (ChromaDB)
 # ==========================================
@@ -53,20 +56,21 @@ def get_llm():
     return OllamaLLM(
         model="qwen2.5:7b",
         temperature=0.3,
-        format="json"  # Ayuda a estructurar respuestas de herramientas
+        format="json"
     )
 
 def create_coo_agent():
     """Crea y devuelve el agente principal tipo COO"""
     llm = get_llm()
-    tools = [save_memory, recall_memory]
+    # 🔧 ACTUALIZADO: Se agrega doctor_diagnose a la lista de herramientas
+    tools = [save_memory, recall_memory, doctor_diagnose]
 
-    # Prompt maestro con instrucciones de comportamiento
     system_prompt = """Eres SuperNova, asistente COO/Operator personal.
 - Responde SIEMPRE en español.
 - Sé eficiente, claro y orientado a la acción.
 - Si el usuario pide guardar información, usa `save_memory`.
 - Si pregunta por algo del pasado, usa `recall_memory`.
+- Si el usuario pide revisar el sistema, diagnosticar fallas o hacer mantenimiento, usa `doctor_diagnose`.
 - Si no sabes algo, dilo claramente y sugiere cómo resolverlo.
 - Mantén un tono profesional pero cercano. No uses lenguaje técnico innecesario."""
 
@@ -77,7 +81,6 @@ def create_coo_agent():
         MessagesPlaceholder(variable_name="agent_scratchpad"),
     ])
 
-    # Agente moderno con soporte de herramientas
     agent = prompt | llm.bind_tools(tools)
     return agent, tools
 
@@ -89,8 +92,6 @@ def run_agent(query: str, chat_history: List[Dict] = []):
     agent, tools = create_coo_agent()
     
     try:
-        # En una versión completa aquí iría el bucle de llamada a herramientas
-        # Para esta fase estable, usamos respuesta directa con contexto
         history_context = "\n".join([f"{h['role']}: {h['content']}" for h in chat_history[-3:]])
         full_prompt = f"{query}\n\n(Contexto reciente: {history_context})"
         
