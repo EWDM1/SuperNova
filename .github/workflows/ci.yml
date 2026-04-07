@@ -1,0 +1,27 @@
+name: 🧪 CI/CD Pipeline
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+      - name: Verify structure & imports
+        run: |
+          python -c "import core.agent; print('✅ core.agent OK')"
+          python -c "from core.tools.doctor import doctor_diagnose; print('✅ doctor OK')"
+          python -c "import api.main; print('✅ api.main OK')"
+          echo "🎉 Validación completada. El proyecto está listo para instalar."
