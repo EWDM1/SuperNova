@@ -1,0 +1,15 @@
+{
+  "tauri": {
+    "allowlist": {
+      "window": {
+        "all": true
+      },
+      "event": {
+        "all": true
+      }
+    },
+    "bundle": {
+      "targets": ["deb", "appimage", "msi", "dmg"]
+    }
+  }
+}
