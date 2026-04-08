@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>SuperNova Confirmation</title>
+  <style>
+    :root {
+      --bg: #0f1115; --text: #e2e8f0; --border: #334155;
+      --allow: #10b981; --deny: #ef4444; --session: #3b82f6;
+      --risk-high: #ef4444; --risk-medium: #f59e0b; --risk-low: #3b82f6;
+    }
+    body {
+      margin: 0; background: var(--bg); color: var(--text);
+      font-family: system-ui, -apple-system, sans-serif;
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      height: 100vh; user-select: none;
+    }
+    .card {
+      width: 420px; padding: 24px; border: 1px solid var(--border);
+      border-radius: 12px; background: #161b22; box-shadow: 0 12px 24px rgba(0,0,0,0.4);
+      text-align: center;
+    }
+    .risk-badge {
+      display: inline-block; padding: 4px 10px; border-radius: 20px;
+      font-size: 12px; font-weight: 600; margin-bottom: 16px;
+    }
+    .title { font-size: 18px; font-weight: 600; margin-bottom: 8px; }
+    .preview {
+      background: #0d1117; padding: 12px; border-radius: 8px;
+      font-family: monospace; font-size: 13px; color: #9ca3af;
+      margin: 16px 0; text-align: left; word-break: break-all;
+    }
+    .actions { display: flex; gap: 10px; justify-content: center; margin-top: 20px; }
+    button {
+      padding: 10px 18px; border: none; border-radius: 6px;
+      font-weight: 500; cursor: pointer; transition: opacity 0.2s;
+    }
+    button:hover { opacity: 0.9; }
+    .btn-allow { background: var(--allow); color: #fff; }
+    .btn-deny { background: var(--deny); color: #fff; }
+    .btn-session { background: var(--session); color: #fff; }
+    .timer { font-size: 12px; color: #64748b; margin-top: 12px; }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <span class="risk-badge" id="risk-badge">RISK</span>
+    <div class="title" id="title">Confirmar Acción</div>
+    <div class="preview" id="preview">Cargando...</div>
+    <div class="actions">
+      <button class="btn-session" onclick="respond('allow_session')">Esta sesión</button>
+      <button class="btn-allow" onclick="respond('allow')">Permitir</button>
+      <button class="btn-deny" onclick="respond('deny')">Denegar</button>
+    </div>
+    <div class="timer" id="timer">Expira en 30s</div>
+  </div>
+  <script>
+    let timeoutId;
+    window.__hitlAPI = {
+      open: (req) => {
+        document.getElementById('title').textContent = req.description;
+        document.getElementById('preview').textContent = req.payload_preview;
+        const badge = document.getElementById('risk-badge');
+        badge.textContent = req.risk_level.toUpperCase();
+        badge.style.background = `var(--risk-${req.risk_level})`;
+        badge.style.color = '#fff';
+        
+        let remaining = req.timeout_ms / 1000;
+        const timerEl = document.getElementById('timer');
+        timeoutId = setInterval(() => {
+          remaining--;
+          timerEl.textContent = `Expira en ${remaining}s`;
+          if (remaining <= 0) respond('deny', 'timeout');
+        }, 1000);
+      },
+      close: () => {
+        document.body.innerHTML = '';
+        clearTimeout(timeoutId);
+      }
+    };
+    window.respond = (decision, trigger = 'user_click') => {
+      window.__tauri?.event?.emit('hitl:response', { decision, trigger });
+    };
+  </script>
+</body>
+</html>
