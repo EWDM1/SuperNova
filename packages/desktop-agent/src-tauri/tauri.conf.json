@@ -1,6 +1,7 @@
 {
   "productName": "SuperNova Desktop",
   "version": "1.0.0",
+  "identifier": "com.supernova.desktop",
   "build": {
     "frontendDist": "../dist",
     "devUrl": "http://localhost:1420",
@@ -9,20 +10,47 @@
     "withGlobalTauri": true
   },
   "app": {
+    "withGlobalTauri": true,
     "windows": [],
     "security": {
-      "csp": "default-src 'self' 'unsafe-inline' 'unsafe-eval'; connect-src ipc: http://ipc.localhost"
+      "csp": "default-src 'self' 'unsafe-inline' 'unsafe-eval'; connect-src ipc: http://ipc.localhost tauri://localhost",
+      "capabilities": ["default"]
     }
   },
   "bundle": {
     "active": true,
-    "targets": "all",
+    "targets": ["dmg", "msi", "deb", "appimage"],
     "icon": [
       "icons/32x32.png",
       "icons/128x128.png",
       "icons/128x128@2x.png",
       "icons/icon.icns",
       "icons/icon.ico"
-    ]
+    ],
+    "windows": {
+      "certificateThumbprint": null,
+      "digestAlgorithm": "sha256",
+      "timestampUrl": "http://timestamp.digicert.com",
+      "wix": { "language": ["es-ES", "en-US"] },
+      "nsis": { "installerIcon": "icons/icon.ico", "installMode": "perMachine" }
+    },
+    "macOS": {
+      "frameworks": [],
+      "minimumSystemVersion": "12.0",
+      "exceptionDomain": "",
+      "signingIdentity": null,
+      "entitlements": null,
+      "providerShortName": null
+    },
+    "linux": {
+      "deb": { "depends": ["libwebkit2gtk-4.1-0", "libappindicator3-1"] }
+    }
+  },
+  "plugins": {
+    "updater": {
+      "pubkey": "dW50cnVzdGVkIGNvbW1lbnQ6IG1pbmlzaWduIHB1YmxpYyBrZXk6IFNVUEVSTk9WQQpSV0RZV0lQYjNzT0xGcVl0cGpLdGxjZ0dQV0xGcVl0cGpLdGxjZ0dQV0xGcVl0cGpLdGxjZ0c=",
+      "endpoints": ["https://github.com/OWNER/REPO/releases/latest/download/latest.json"],
+      "windows": { "installMode": "passive" }
+    }
   }
 }
