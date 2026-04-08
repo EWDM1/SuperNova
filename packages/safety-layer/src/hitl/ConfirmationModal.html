@@ -33,9 +33,10 @@
     .actions { display: flex; gap: 10px; justify-content: center; margin-top: 20px; }
     button {
       padding: 10px 18px; border: none; border-radius: 6px;
-      font-weight: 500; cursor: pointer; transition: opacity 0.2s;
+      font-weight: 500; cursor: pointer; transition: opacity 0.2s, transform 0.1s;
     }
-    button:hover { opacity: 0.9; }
+    button:hover:not(:disabled) { opacity: 0.9; }
+    button:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
     .btn-allow { background: var(--allow); color: #fff; }
     .btn-deny { background: var(--deny); color: #fff; }
     .btn-session { background: var(--session); color: #fff; }
@@ -56,6 +57,8 @@
   </div>
   <script>
     let timeoutId;
+    let isResponding = false;
+
     window.__hitlAPI = {
       open: (req) => {
         document.getElementById('title').textContent = req.description;
@@ -65,10 +68,10 @@
         badge.style.background = `var(--risk-${req.risk_level})`;
         badge.style.color = '#fff';
         
-        let remaining = req.timeout_ms / 1000;
+        let remaining = Math.ceil(req.timeout_ms / 1000);
         const timerEl = document.getElementById('timer');
         timeoutId = setInterval(() => {
-          remaining--;
+          remaining = Math.max(0, remaining - 1);
           timerEl.textContent = `Expira en ${remaining}s`;
           if (remaining <= 0) respond('deny', 'timeout');
         }, 1000);
@@ -78,8 +81,20 @@
         clearTimeout(timeoutId);
       }
     };
+
     window.respond = (decision, trigger = 'user_click') => {
-      window.__tauri?.event?.emit('hitl:response', { decision, trigger });
+      if (isResponding) return;
+      isResponding = true;
+      
+      document.querySelectorAll('button').forEach(b => b.disabled = true);
+      clearTimeout(timeoutId);
+
+      const tauri = window.__TAURI__ || window.__tauri;
+      if (tauri?.event) {
+        tauri.event.emit('hitl:response', { decision, trigger });
+      } else {
+        console.error('Tauri event bridge not available');
+      }
     };
   </script>
 </body>
