@@ -6,14 +6,17 @@ VENV_PATH="$PROJECT_ROOT/.venv"
 LOGS_DIR="$PROJECT_ROOT/logs"
 
 # --- Funciones de Utilidad ---
-log_info() { echo -e "✨ \033[1;34mINFO:\033[0m $1"; }
+log_info()    { echo -e "✨ \033[1;34mINFO:\033[0m $1"; }
 log_success() { echo -e "✅ \033[1;32mÉXITO:\033[0m $1"; }
-log_warn() { echo -e "⚠️ \033[1;33mADVERTENCIA:\033[0m $1"; }
-log_error() { echo -e "❌ \033[1;31mERROR:\033[0m $1" >&2; exit 1; }
+log_warn()    { echo -e "⚠️  \033[1;33mADVERTENCIA:\033[0m $1"; }
+log_error()   { echo -e "❌ \033[1;31mERROR:\033[0m $1" >&2; exit 1; }
 
 check_command() {
-    command -v "$1" >/dev/null 2>&1 || log_error "El comando \'$1\' no está instalado. Por favor, instálalo y vuelve a intentarlo."
+    command -v "$1" >/dev/null 2>&1 || log_error "El comando '$1' no está instalado. Por favor, instálalo y vuelve a intentarlo."
 }
+
+# --- Crear directorio de logs PRIMERO (antes de cualquier nohup) ---
+mkdir -p "$LOGS_DIR" || log_error "Fallo al crear el directorio de logs."
 
 # --- Verificaciones Iniciales ---
 log_info "Verificando entorno..."
@@ -43,57 +46,48 @@ fi
 
 log_info "Verificando si el modelo Ollama está disponible..."
 MODEL_NAME=$(python -c "from config.settings import settings; print(settings.MODEL_NAME)")
+
 if ! ollama list | grep -q "$MODEL_NAME"; then
-    log_info "Modelo \'$MODEL_NAME\' no encontrado localmente. Descargándolo..."
-    ollama pull "$MODEL_NAME" || log_error "Fallo al descargar el modelo \'$MODEL_NAME\'."
+    log_info "Modelo '$MODEL_NAME' no encontrado localmente. Descargándolo..."
+    ollama pull "$MODEL_NAME" || log_error "Fallo al descargar el modelo '$MODEL_NAME'."
 fi
 
 log_info "Iniciando servidor Ollama en segundo plano si no está corriendo..."
 if ! pgrep -x "ollama" > /dev/null; then
-    nohup ollama serve > "$LOGS_DIR/ollama.log" 2>&1 & 
+    nohup ollama serve > "$LOGS_DIR/ollama.log" 2>&1 &
     log_info "Ollama iniciado. Esperando unos segundos para que se inicialice..."
     sleep 5
 else
     log_info "Ollama ya está corriendo."
 fi
 
-# --- Directorio de Logs ---
-mkdir -p "$LOGS_DIR" || log_error "Fallo al crear el directorio de logs."
-
 # --- Manejo de Puertos (para la API) ---
 API_PORT=$(python -c "from config.settings import settings; print(settings.API_PORT)")
 log_info "Verificando disponibilidad del puerto $API_PORT para la API..."
-if lsof -i :$API_PORT -sTCP:LISTEN >/dev/null; then
-    log_warn "El puerto $API_PORT ya está en uso. Intentando encontrar un puerto libre..."
-    # Encuentra un puerto libre a partir de 8001
-    FREE_PORT=$(python -c \'import socket; s=socket.socket(); s.bind((\'\', 0)); print(s.getsockname()[1]); s.close()\')
+
+if lsof -i :"$API_PORT" -sTCP:LISTEN >/dev/null 2>&1; then
+    log_warn "El puerto $API_PORT ya está en uso. Buscando un puerto libre..."
+    FREE_PORT=$(python -c 'import socket; s=socket.socket(); s.bind(("", 0)); print(s.getsockname()[1]); s.close()')
     log_warn "Usando el puerto libre $FREE_PORT para la API."
     API_PORT=$FREE_PORT
-    # Actualizar la configuración de Pydantic Settings en tiempo de ejecución si es posible, o al menos informar
-    export SUPERNOVA_API_PORT=$API_PORT # Para que pydantic-settings lo recoja
+    export SUPERNOVA_API_PORT=$API_PORT
 fi
 
 # --- Iniciar Voice Daemon (Wake Word) ---
-log_info "Iniciando el demonio de detección de palabra clave (voice_daemon.py) en segundo plano..."
-nohup python "$PROJECT_ROOT/cli/voice_daemon.py" > "$LOGS_DIR/wake_word.log" 2>&1 & 
+log_info "Iniciando el demonio de detección de palabra clave en segundo plano..."
+nohup python "$PROJECT_ROOT/cli/voice_daemon.py" > "$LOGS_DIR/wake_word.log" 2>&1 &
 VOICE_DAEMON_PID=$!
-log_info "Demonio de voz iniciado con PID: $VOICE_DAEMON_PID. Los logs están en $LOGS_DIR/wake_word.log"
+log_info "Demonio de voz iniciado con PID: $VOICE_DAEMON_PID. Logs en $LOGS_DIR/wake_word.log"
 
 # --- Abrir Dashboard ---
 log_info "Abriendo el dashboard en tu navegador..."
-# Intentar abrir con `open` en macOS o `xdg-open` en Linux
 if command -v open >/dev/null 2>&1; then
     open "http://localhost:$API_PORT/dashboard"
 elif command -v xdg-open >/dev/null 2>&1; then
     xdg-open "http://localhost:$API_PORT/dashboard"
 else
-    log_warn "No se pudo abrir el navegador automáticamente. Por favor, abre http://localhost:$API_PORT/dashboard manualmente."
+    log_warn "No se pudo abrir el navegador automáticamente. Abre manualmente: http://localhost:$API_PORT/dashboard"
 fi
-
-# --- Iniciar API (Uvicorn) ---
-log_info "Iniciando la API de SuperNova con Uvicorn en http://localhost:$API_PORT..."
-# Asegurarse de que el puerto se pase correctamente a uvicorn
-uvicorn api.main:app --host 0.0.0.0 --port $API_PORT --reload || log_error "Fallo al iniciar la API de SuperNova."
 
 # --- Limpieza al Salir ---
 cleanup() {
@@ -103,5 +97,8 @@ cleanup() {
     deactivate
     log_success "SuperNova se ha detenido limpiamente."
 }
-
 trap cleanup EXIT
+
+# --- Iniciar API (Uvicorn) ---
+log_info "Iniciando la API de SuperNova con Uvicorn en http://localhost:$API_PORT..."
+uvicorn api.main:app --host 0.0.0.0 --port "$API_PORT" --reload || log_error "Fallo al iniciar la API de SuperNova."

@@ -77,30 +77,25 @@ fi
 
 # 7. Configurar entorno virtual de Python
 echo "📦 Configurando entorno Python..."
-if [ ! -d "venv" ]; then
-    python3 -m venv venv
+if [ ! -d ".venv" ]; then
+    python3 -m venv .venv
     echo "✅ Entorno virtual creado."
 fi
-source venv/bin/activate
-pip install --upgrade pip
+source .venv/bin/activate
+pip install --upgrade pip setuptools wheel
 
-# Instalar dependencias si existe el archivo, sino instalar las base
-if [ -f "requirements.txt" ]; then
-    echo "📥 Instalando dependencias desde requirements.txt..."
-    pip install -r requirements.txt
-else
-    echo "📥 Instalando dependencias base..."
-    pip install fastapi uvicorn langchain-community ollama chromadb typer python-dotenv pydantic python-docx openpyxl
-fi
+# Instalar dependencias desde pyproject.toml (fuente única de verdad)
+echo "📥 Instalando dependencias del proyecto..."
+pip install -e .
 deactivate
 echo "✅ Entorno Python configurado."
 
 # 8. Descargar modelo de IA
-echo "🧠 Descargando modelo de IA (Qwen 3.6)..."
+echo "🧠 Descargando modelo de IA (Qwen 2.5)..."
 echo "   ⏳ Esto puede tardar 5-15 min según tu conexión..."
-ollama pull qwen3.6:8b 2>/dev/null || {
-    echo "⚠️  Modelo no encontrado en repositorio oficial. Descargando alternativa estable..."
-    ollama pull qwen2.5:7b
+ollama pull qwen2.5:7b || {
+    echo "❌ Fallo al descargar el modelo. Revisa tu conexión u Ollama."
+    exit 1
 }
 echo "✅ Modelo descargado."
 
@@ -115,8 +110,7 @@ echo "========================================="
 echo "🎉 ¡Instalación completada con éxito!"
 echo "📌 Próximos pasos (cuando abras Terminal):"
 echo "   1. cd SuperNova"
-echo "   2. source venv/bin/activate"
-echo "   3. python cli/main.py 'hola SuperNova'"
-echo "💡 Tip: Para ejecutar sin activar venv, usa: ./venv/bin/python cli/main.py"
+2. ./start.sh
+echo "💡 Tip: Para usar la CLI directamente: ./.venv/bin/supernova ask 'hola'"
 echo "========================================="
 echo "✅ SuperNova está listo. ¡Disfruta tu COO personal!"
