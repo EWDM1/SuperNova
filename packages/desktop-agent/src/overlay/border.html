@@ -5,34 +5,50 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>SuperNova Control Indicator</title>
   <style>
+    :root {
+      --border-color: transparent;
+      --shadow-color: transparent;
+      --transition-speed: 0.25s;
+    }
     * { margin: 0; padding: 0; box-sizing: border-box; }
     html, body { 
-      width: 100vw; 
-      height: 100vh; 
-      background: transparent; 
-      pointer-events: none; 
-      overflow: hidden;
+      width: 100vw; height: 100vh; background: transparent; 
+      pointer-events: none; overflow: hidden;
     }
     #border {
-      position: fixed;
-      inset: 0;
-      border: 2px solid #00f3ff;
-      box-shadow: 0 0 12px 2px rgba(0, 243, 255, 0.35), inset 0 0 12px 2px rgba(0, 243, 255, 0.15);
-      opacity: 0;
-      transition: opacity 0.25s ease;
-      pointer-events: none;
-      z-index: 2147483647; /* Max Z */
+      position: fixed; inset: 0;
+      border: 2px solid var(--border-color);
+      box-shadow: 0 0 12px 2px var(--shadow-color), inset 0 0 12px 2px var(--shadow-color);
+      opacity: 0; transition: opacity var(--transition-speed) ease, border-color var(--transition-speed) ease, box-shadow var(--transition-speed) ease;
+      pointer-events: none; z-index: 2147483647;
     }
     #border.active { opacity: 1; }
+    
+    /* Estado: Ejecutando */
+    #border.executing { --border-color: #00f3ff; --shadow-color: rgba(0, 243, 255, 0.35); }
+    /* Estado: Esperando HITL */
+    #border.awaiting_confirmation { --border-color: #ff3b3b; --shadow-color: rgba(255, 59, 59, 0.4); animation: pulse 1.2s infinite; }
+    /* Estado: Completado */
+    #border.completed { --border-color: #00ff88; --shadow-color: rgba(0, 255, 136, 0.35); }
+    /* Estado: Error */
+    #border.error { --border-color: #ffa500; --shadow-color: rgba(255, 165, 0, 0.35); }
+
+    @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.7; } }
   </style>
 </head>
 <body>
   <div id="border"></div>
   <script>
-    // Expone métodos globales para control desde Tauri
     window.__borderAPI = {
-      show: () => document.getElementById('border').classList.add('active'),
-      hide: () => document.getElementById('border').classList.remove('active')
+      setState: (state) => {
+        const el = document.getElementById('border');
+        el.classList.remove('executing', 'awaiting_confirmation', 'completed', 'error');
+        if (state === 'idle') {
+          el.classList.remove('active');
+        } else {
+          el.classList.add('active', state);
+        }
+      }
     };
   </script>
 </body>
