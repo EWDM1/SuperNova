@@ -1,6 +1,6 @@
 # 🌟 SuperNova - Tu Asistente IA Personal (Modo COO)
 
-> **Versión**: 1.0.0 | **Creado para**: Empresarios en Panamá | **Privado**: ✅
+> **Versión**: 1.0.0 | **Creado para**: Empresarios de Alto Nivel y Entusiastas Hi-Tech | **Privado**: ✅
 
 ---
 
