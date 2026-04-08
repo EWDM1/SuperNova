@@ -1,23 +1,25 @@
 import { initBorderOverlay } from './overlay/BorderOverlay';
-import { invoke } from '@tauri-apps/api/tauri';
+import { initHITLModal } from '../../safety-layer/src/hitl/ConfirmationModal'; // Ajusta ruta relativa si es necesario
+import { AuditLogger } from '../../safety-layer/src/audit-logger';
+import path from 'path';
+import os from 'os';
 
 async function bootstrap() {
-  // 1. Inicializar overlay
-  await initBorderOverlay();
+  // 1. Inicializar Audit Logger
+  const audit = new AuditLogger(
+    path.join(os.homedir(), '.supernova', 'logs'),
+    process.env.AUDIT_ENCRYPTION_KEY
+  );
+  await audit.init();
 
-  // 2. Hook en el ciclo de ejecución del agente
-  // Ejemplo: wrapper alrededor del action-executor
-  const originalExecute = window.__actionExecutor?.run;
-  if (originalExecute) {
-    window.__actionExecutor.run = async (task: any) => {
-      await invoke('emit', { event: 'control:started' });
-      try {
-        return await originalExecute(task);
-      } finally {
-        await invoke('emit', { event: 'control:finished' });
-      }
-    };
-  }
+  // 2. Inicializar Overlay & Modal HITL
+  await initBorderOverlay();
+  await initHITLModal();
+
+  // 3. Expone audit globalmente para injection en safety-layer/executor
+  (globalThis as any).__supernova_audit = audit;
+
+  // ... resto de tu lógica de inicialización Tauri ...
 }
 
 bootstrap().catch(console.error);
