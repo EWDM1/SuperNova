@@ -4,52 +4,37 @@ import { listen, emit } from '@tauri-apps/api/event';
 const OVERLAY_LABEL = 'supernova_control_border';
 let borderWindow: WebviewWindow | null = null;
 
+type OverlayState = 'idle' | 'executing' | 'awaiting_confirmation' | 'completed' | 'error';
+
 export async function initBorderOverlay() {
-  // Crear ventana al inicio (oculta por defecto)
   borderWindow = new WebviewWindow(OVERLAY_LABEL, {
     url: './src/overlay/border.html',
     title: 'SuperNova Active',
-    width: 1920,
-    height: 1080,
-    decorations: false,
-    transparent: true,
-    alwaysOnTop: true,
-    skipTaskbar: true,
-    focus: false,
-    resizable: false,
-    visible: false,
+    width: 1920, height: 1080,
+    decorations: false, transparent: true, alwaysOnTop: true,
+    skipTaskbar: true, focus: false, resizable: false, visible: false,
     acceptFirstMouse: true
   });
 
-  // Escuchar eventos de control
-  await listen<string>('control:started', async () => {
-    await ensureBorderSize();
-    await borderWindow?.show();
-    await borderWindow?.eval('window.__borderAPI.show()');
+  // Escuchar cambios de estado globales
+  await listen<{ state: OverlayState; context?: string }>('supernova:state-change', async ({ payload }) => {
+    if (!borderWindow) return;
+    if (payload.state !== 'idle' && !(await borderWindow.isVisible())) {
+      await borderWindow.show();
+    }
+    await borderWindow.eval(`window.__borderAPI.setState('${payload.state}')`);
+    
+    if (payload.state === 'completed' || payload.state === 'error') {
+      setTimeout(async () => {
+        if (borderWindow && await borderWindow.isVisible()) {
+          await borderWindow.eval(`window.__borderAPI.setState('idle')`);
+          await borderWindow.hide();
+        }
+      }, 1500);
+    }
   });
-
-  await listen('control:finished', async () => {
-    await borderWindow?.eval('window.__borderAPI.hide()');
-    setTimeout(async () => await borderWindow?.hide(), 300);
-  });
-
-  // Ajustar a monitor activo al redimensionar
-  window.addEventListener('resize', ensureBorderSize);
 }
 
-async function ensureBorderSize() {
-  if (!borderWindow) return;
-  // Tauri v2: obtener dimensiones del monitor primario o donde está el cursor
-  // Simplificado: usar pantalla completa del OS
-  const { width, height } = await import('@tauri-apps/api/window').then(m => m.availableMonitor());
-  await borderWindow.setSize(m.PhysicalSize.new(width, height));
-  await borderWindow.setPosition(m.PhysicalPosition.new(0, 0));
-}
-
-export async function triggerBorderShow() {
-  await emit('control:started');
-}
-
-export async function triggerBorderHide() {
-  await emit('control:finished');
+export async function triggerStateChange(state: OverlayState, context?: string) {
+  await emit('supernova:state-change', { state, timestamp: Date.now(), context });
 }
