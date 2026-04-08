@@ -49,7 +49,7 @@
   "plugins": {
     "updater": {
       "pubkey": "dW50cnVzdGVkIGNvbW1lbnQ6IG1pbmlzaWduIHB1YmxpYyBrZXk6IFNVUEVSTk9WQQpSV0RZV0lQYjNzT0xGcVl0cGpLdGxjZ0dQV0xGcVl0cGpLdGxjZ0dQV0xGcVl0cGpLdGxjZ0c=",
-      "endpoints": ["https://github.com/OWNER/REPO/releases/latest/download/latest.json"],
+      "endpoints": ["https://github.com/EWDM1/SuperNova/releases/latest/download/latest.json"],
       "windows": { "installMode": "passive" }
     }
   }
