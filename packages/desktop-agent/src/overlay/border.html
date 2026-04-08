@@ -23,16 +23,10 @@
       pointer-events: none; z-index: 2147483647;
     }
     #border.active { opacity: 1; }
-    
-    /* Estado: Ejecutando */
     #border.executing { --border-color: #00f3ff; --shadow-color: rgba(0, 243, 255, 0.35); }
-    /* Estado: Esperando HITL */
     #border.awaiting_confirmation { --border-color: #ff3b3b; --shadow-color: rgba(255, 59, 59, 0.4); animation: pulse 1.2s infinite; }
-    /* Estado: Completado */
     #border.completed { --border-color: #00ff88; --shadow-color: rgba(0, 255, 136, 0.35); }
-    /* Estado: Error */
     #border.error { --border-color: #ffa500; --shadow-color: rgba(255, 165, 0, 0.35); }
-
     @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.7; } }
   </style>
 </head>
