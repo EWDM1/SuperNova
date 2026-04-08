@@ -1,0 +1,16 @@
+{
+  "riskThresholds": { "hitl": 45, "deny": 80 },
+  "allowlistPatterns": [
+    "/Users/*/Documents/**",
+    "C:\\Workspace\\**",
+    "https://app.hubspot.com/**"
+  ],
+  "denylistPatterns": [
+    "rm -rf /",
+    "DROP TABLE",
+    "format C:",
+    "*/.env",
+    "*/.ssh/**"
+  ],
+  "enableHeuristicScoring": true
+}
