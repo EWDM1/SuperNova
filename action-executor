@@ -1,0 +1,13 @@
+[Action Executor] → emit('supernova:state-change', executing)
+         ↓
+[Borde: Cyan] → Usuario observa
+         ↓
+[Safety Layer] → detecta acción crítica → emit('awaiting_confirmation')
+         ↓
+[Borde: Rojo + Pulse] → UI nativa pide confirmación
+         ↓
+[Usuario] → Acepta → SafetyEvents.confirmationGranted()
+         ↓
+[Borde: Cyan] → Reanuda ejecución
+         ↓
+[Final] → emit('completed') → [Borde: Verde 1.5s] → [Oculta]
