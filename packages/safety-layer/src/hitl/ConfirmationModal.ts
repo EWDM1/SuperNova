@@ -21,15 +21,16 @@ export async function initHITLModal() {
   });
 
   await listen<{ decision: HITLResponse['decision']; trigger: HITLResponse['trigger'] }>('hitl:response', async ({ payload }) => {
-    const activeReq = [...pendingResolvers.values()].pop();
+    const activeReq = [...pendingResolvers.entries()].pop();
     if (activeReq) {
-      clearTimeout(activeReq.timeout);
-      activeReq.resolve({
-        action_id: 'pending', // Se asigna en request
+      clearTimeout(activeReq[1].timeout);
+      activeReq[1].resolve({
+        action_id: activeReq[0],
         decision: payload.decision,
         timestamp: Date.now(),
         trigger: payload.trigger
       });
+      pendingResolvers.delete(activeReq[0]);
       await modalWindow?.hide();
       await modalWindow?.eval('window.__hitlAPI.close()');
     }
@@ -40,20 +41,19 @@ async function showModal(req: HITLRequest) {
   if (!modalWindow) return;
   
   const promise = new Promise<HITLResponse>((resolve) => {
-    pendingResolvers.set(req.action_id, { resolve, timeout: setTimeout(() => {
+    const timeout = setTimeout(() => {
       modalWindow?.eval(`window.respond('deny', 'timeout')`);
-    }, req.timeout_ms) });
+    }, req.timeout_ms);
+    pendingResolvers.set(req.action_id, { resolve, timeout });
   });
 
   await modalWindow.eval(`window.__hitlAPI.open(${JSON.stringify(req)})`);
   await modalWindow.show();
   
   const response = await promise;
-  response.action_id = req.action_id; // Assign ID post-resolution
   await emit('hitl:resolved', response);
 }
 
-// Expuesto para el safety-layer
 export async function triggerHITLRequest(req: HITLRequest) {
   await emit('hitl:request', { request: req });
 }
