@@ -11,3 +11,37 @@
 [Borde: Cyan] → Reanuda ejecución
          ↓
 [Final] → emit('completed') → [Borde: Verde 1.5s] → [Oculta]
+
+import PolicyEngine, { PolicyAction } from '../safety-layer/src/policy-engine';
+import { triggerHITLRequest } from '../safety-layer/src/hitl/ConfirmationModal';
+import { listen } from '@tauri-apps/api/event';
+
+const policy = new PolicyEngine(); // Cargar desde policy-config.json
+let hitlResolver: ((val: any) => void) | null = null;
+
+listen('hitl:resolved', (e) => hitlResolver?.(e.payload));
+
+export async function safeExecute(action: PolicyAction) {
+  const eval = policy.evaluate(action);
+  auditLog(eval); // Implementar log estructurado local
+
+  if (eval.decision === 'DENY') throw new Error(`BLOCKED: ${eval.reason}`);
+  
+  if (eval.decision === 'HITL') {
+    await triggerHITLRequest({
+      action_id: action.id,
+      action_type: action.type,
+      description: eval.reason,
+      risk_level: eval.riskLevel,
+      payload_preview: action.payload.slice(0, 150),
+      timeout_ms: 30000
+    });
+
+    const res = await new Promise(resolve => { hitlResolver = resolve; });
+    if (res.decision === 'deny') throw new Error('HITL: Denied');
+    if (res.decision === 'allow_session') policy.addToSessionAllowlist(action.payload);
+  }
+
+  // ALLOW → ejecutar acción real
+  return await action.execute();
+}
