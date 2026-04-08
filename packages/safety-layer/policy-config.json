@@ -10,7 +10,9 @@
     "DROP TABLE",
     "format C:",
     "*/.env",
-    "*/.ssh/**"
+    "*/.ssh/**",
+    "sudo su",
+    "passwd"
   ],
   "enableHeuristicScoring": true
 }
