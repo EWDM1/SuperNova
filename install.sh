@@ -58,13 +58,16 @@ else
     echo "✅ Ollama ya está instalado."
 fi
 
-# Instalar portaudio (dependencia de sonido para macOS)
-if [[ "$OSTYPE" == "darwin"* ]] && ! brew list portaudio &>/dev/null; then
-    echo "🔧 Instalando portaudio (audio macOS)..."
+# 6. Instalar portaudio (dependencia de audio para macOS)
+if ! brew list portaudio &>/dev/null; then
+    echo "🔧 Instalando portaudio (dependencia de audio)..."
     brew install portaudio
+    echo "✅ portaudio instalado."
+else
+    echo "✅ portaudio ya está instalado."
 fi
 
-# 6. Instalar Python 3.11+
+# 7. Instalar Python 3.11+
 if ! command -v python3 &> /dev/null || ! python3 -c "import sys; exit(0 if sys.version_info >= (3, 11) else 1)" 2>/dev/null; then
     echo "🐍 Instalando Python 3.11+..."
     brew install python@3.11
@@ -75,42 +78,46 @@ else
     echo "✅ Python compatible ya está instalado."
 fi
 
-# 7. Configurar entorno virtual de Python
+# 8. Configurar entorno virtual de Python
 echo "📦 Configurando entorno Python..."
 if [ ! -d ".venv" ]; then
     python3 -m venv .venv
     echo "✅ Entorno virtual creado."
 fi
+
 source .venv/bin/activate
 pip install --upgrade pip setuptools wheel
 
 # Instalar dependencias desde pyproject.toml (fuente única de verdad)
-echo "📥 Instalando dependencias del proyecto..."
-pip install -e .
+echo "📥 Instalando dependencias del proyecto desde pyproject.toml..."
+pip install -e . || {
+    echo "❌ Fallo al instalar dependencias. Verifica que pyproject.toml esté correcto."
+    exit 1
+}
 deactivate
 echo "✅ Entorno Python configurado."
 
-# 8. Descargar modelo de IA
-echo "🧠 Descargando modelo de IA (Qwen 2.5)..."
-echo "   ⏳ Esto puede tardar 5-15 min según tu conexión..."
-ollama pull qwen2.5:7b || {
+# 9. Descargar modelo de IA (Qwen3 8B — generación actual, supera a Qwen2.5-72B en mismo tamaño)
+echo "🧠 Descargando modelo de IA (qwen3:8b)..."
+echo "   ⏳ Esto puede tardar 5-15 min según tu conexión (~5GB)..."
+ollama pull qwen3:8b || {
     echo "❌ Fallo al descargar el modelo. Revisa tu conexión u Ollama."
     exit 1
 }
 echo "✅ Modelo descargado."
 
-# 9. Crear estructura de carpetas
+# 10. Crear estructura de carpetas y directorios de runtime
 echo "📁 Creando estructura del proyecto..."
-mkdir -p core/memory core/tools api cli config docs backups logs
+mkdir -p memory backups logs config core/memory core/tools api cli docs
 touch core/__init__.py core/tools/__init__.py api/__init__.py cli/__init__.py
 echo "✅ Carpetas creadas."
 
-# 10. Mensaje final
+# 11. Mensaje final
 echo "========================================="
 echo "🎉 ¡Instalación completada con éxito!"
-echo "📌 Próximos pasos (cuando abras Terminal):"
+echo "📌 Próximos pasos:"
 echo "   1. cd SuperNova"
-2. ./start.sh
+echo "   2. ./start.sh"
 echo "💡 Tip: Para usar la CLI directamente: ./.venv/bin/supernova ask 'hola'"
 echo "========================================="
 echo "✅ SuperNova está listo. ¡Disfruta tu COO personal!"
