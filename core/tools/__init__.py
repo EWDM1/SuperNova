@@ -1,10 +1,11 @@
 # core/tools/__init__.py
 """
-🛠️ Módulo de herramientas de SuperNova
-Aquí vivirán las capacidades especializadas del agente:
-- Memoria contextual
-- Doctor Bot (diagnóstico/reparación)
-- Integraciones externas (calendario, email, web, etc.)
+🛠️ Registro centralizado de herramientas del agente.
+Para añadir una nueva: importa la función con @tool y agrégala a ALL_TOOLS.
 """
+from .doctor import doctor_diagnose
 
-__all__ = []  # Se actualizará automáticamente al exportar nuevas herramientas
+# 📦 Registro global (fácil de extender sin tocar agent.py)
+ALL_TOOLS = [doctor_diagnose]
+
+__all__ = ["ALL_TOOLS"]
