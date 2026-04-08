@@ -33,9 +33,9 @@ def run_fix(
     """Ejecuta reparaciones automáticas seguras (limpieza de caché, reinicio de servicios locales)."""
     typer.secho("🔧 Modo reparación activado.", fg="yellow")
     if not auto_confirm:
-        typer.secho("💡 Por seguridad, las reparaciones que tocan el sistema requieren confirmación explícita. Usa `python cli/doctor.py check --yes` o responde 's' al prompt.", fg="blue")
+        typer.secho("💡 Por seguridad, las reparaciones requieren confirmación. Usa: `python cli/doctor.py fix --yes`", fg="blue")
     else:
-        typer.secho("✅ Ejecutando mantenimiento preventivo seguro... (v2.0: limpieza de logs antiguos, verificación de permisos, actualización de índices de memoria)", fg="green")
+        typer.secho("✅ Ejecutando mantenimiento preventivo seguro...", fg="green")
 
 if __name__ == "__main__":
     app()
