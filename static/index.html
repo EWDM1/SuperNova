@@ -4,267 +4,775 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>SuperNova — Intelligence Stack Core</title>
-<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Syne:wght@400;600;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
 <style>
   :root {
-    --bg: #04050a; --surface: #090b13; --surface2: #0d1020;
-    --border: rgba(100,130,255,0.12); --border2: rgba(100,130,255,0.06);
-    --accent: #4f6fff; --accent2: #8b5cf6; --glow: rgba(79,111,255,0.35);
-    --text: #e8eeff; --muted: #4a5280; --muted2: #6b75aa;
-    --success: #00e5a0; --warn: #f59e0b;
-    --mono: 'Space Mono', monospace; --sans: 'Syne', sans-serif;
+    --bg: #0A0E1A;
+    --bg-secondary: #0F1420;
+    --bg-elevated: #141827;
+    --text-primary: #E0E7FF;
+    --text-secondary: #8B93B0;
+    --text-tertiary: #5A6381;
+    --accent: #60A5FA;
+    --accent-bright: #93C5FD;
+    --accent-glow: rgba(96, 165, 250, 0.5);
+    --border: rgba(96, 165, 250, 0.15);
+    --card-bg: rgba(20, 24, 39, 0.6);
+    --success: #00E5A0;
+    --warn: #F59E0B;
+    --mono: 'Space Mono', monospace;
+    --sans: 'Inter', -apple-system, sans-serif;
   }
-  * { margin:0; padding:0; box-sizing:border-box; }
+
+  [data-theme="light"] {
+    --bg: #F8FAFC;
+    --bg-secondary: #F1F5F9;
+    --bg-elevated: #E2E8F0;
+    --text-primary: #0F172A;
+    --text-secondary: #475569;
+    --text-tertiary: #94A3B8;
+    --accent: #3B82F6;
+    --accent-bright: #60A5FA;
+    --accent-glow: rgba(59, 130, 246, 0.3);
+    --border: rgba(59, 130, 246, 0.2);
+    --card-bg: rgba(255, 255, 255, 0.8);
+    --success: #10B981;
+    --warn: #F59E0B;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
   body {
-    font-family: var(--sans); background: var(--bg); color: var(--text);
-    height: 100vh; overflow: hidden; display: grid;
-    grid-template-columns: 220px 1fr 260px; grid-template-rows: 58px 1fr;
-    gap: 1px; background-color: var(--border);
+    font-family: var(--sans);
+    background: var(--bg);
+    color: var(--text-primary);
+    height: 100vh;
+    overflow: hidden;
+    display: grid;
+    grid-template-columns: 240px 1fr 280px;
+    grid-template-rows: 64px 1fr;
+    gap: 0;
+    transition: background-color 0.3s ease, color 0.3s ease;
   }
+
+  /* Grid lines overlay */
   body::before {
-    content: ''; position: fixed; inset: 0;
-    background: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,0,0,0.06) 2px, rgba(0,0,0,0.06) 4px);
-    pointer-events: none; z-index: 999;
+    content: '';
+    position: fixed;
+    inset: 0;
+    background: 
+      repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(96, 165, 250, 0.03) 2px, rgba(96, 165, 250, 0.03) 4px);
+    pointer-events: none;
+    z-index: 0;
   }
+
+  /* Radial glow */
+  body::after {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: 
+      radial-gradient(circle at 10% 20%, rgba(96, 165, 250, 0.08) 0%, transparent 50%),
+      radial-gradient(circle at 90% 80%, rgba(147, 197, 253, 0.06) 0%, transparent 50%);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  /* HEADER */
   header {
-    grid-column: 1/-1; background: var(--surface); display: flex;
-    align-items: center; justify-content: space-between; padding: 0 20px;
-    position: relative; overflow: hidden;
+    grid-column: 1/-1;
+    background: var(--bg-secondary);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 24px;
+    position: relative;
+    z-index: 100;
+    border-bottom: 1px solid var(--border);
   }
-  header::after {
-    content: ''; position: absolute; bottom: 0; left: 0; right: 0;
-    height: 1px; background: linear-gradient(90deg, transparent, var(--accent), var(--accent2), transparent);
-  }
+
   .logo {
-    font-family: var(--sans); font-weight: 800; font-size: 1.2rem;
+    font-family: var(--sans);
+    font-weight: 300;
+    font-size: 20px;
     letter-spacing: -0.02em;
-    background: linear-gradient(135deg, #fff 30%, var(--accent));
-    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-    background-clip: text;
   }
-  .logo span {
-    font-family: var(--mono); font-size: 0.65rem; letter-spacing: 0.15em;
-    color: var(--muted2); -webkit-text-fill-color: var(--muted2);
-    display: block; margin-top: -2px;
+
+  .logo strong {
+    font-weight: 700;
+    color: var(--accent-bright);
   }
+
+  .logo-sub {
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 2px;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    display: block;
+    margin-top: -2px;
+  }
+
   .nav-center {
-    display: flex; gap: 1px; background: var(--border2);
-    border: 1px solid var(--border); border-radius: 8px; overflow: hidden;
+    display: flex;
+    gap: 2px;
+    background: transparent;
   }
+
   .nav-tab {
-    font-family: var(--mono); font-size: 0.65rem; letter-spacing: 0.08em;
-    padding: 6px 14px; color: var(--muted2); cursor: pointer;
-    transition: all 0.2s; text-transform: uppercase; user-select: none;
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 1.5px;
+    padding: 8px 16px;
+    color: var(--text-secondary);
+    cursor: pointer;
+    transition: all 0.2s;
+    text-transform: uppercase;
+    user-select: none;
+    border-bottom: 2px solid transparent;
   }
-  .nav-tab:hover { color: var(--text); }
-  .nav-tab.active { background: rgba(79,111,255,0.15); color: var(--accent); }
-  .header-right { display: flex; align-items: center; gap: 16px; }
+
+  .nav-tab:hover { 
+    color: var(--accent); 
+  }
+
+  .nav-tab.active {
+    color: var(--accent);
+    border-bottom-color: var(--accent);
+  }
+
+  .header-right {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+  }
+
   .status-pill {
-    display: flex; align-items: center; gap: 6px;
-    font-family: var(--mono); font-size: 0.65rem; letter-spacing: 0.08em;
-    color: var(--success); background: rgba(0,229,160,0.08);
-    border: 1px solid rgba(0,229,160,0.2); padding: 4px 10px; border-radius: 4px;
-  }
-  .pulse {
-    width: 6px; height: 6px; border-radius: 50%; background: var(--success);
-    box-shadow: 0 0 8px var(--success); animation: pulse 2s infinite;
-  }
-  @keyframes pulse { 0%,100% { opacity:1; transform:scale(1); } 50% { opacity:0.4; transform:scale(0.7); } }
-  .time-display { font-family: var(--mono); font-size: 0.7rem; color: var(--muted); }
-  .panel { background: var(--surface); overflow: hidden; position: relative; }
-  #sidebar-left {
-    display: flex; flex-direction: column; padding: 16px; gap: 8px;
-    overflow-y: auto; scrollbar-width: thin; scrollbar-color: var(--border) transparent;
-  }
-  .section-label {
-    font-family: var(--mono); font-size: 0.6rem; letter-spacing: 0.15em;
-    color: var(--muted); text-transform: uppercase; padding: 8px 0 4px;
-  }
-  .metric-card {
-    background: var(--surface2); border: 1px solid var(--border2);
-    border-radius: 8px; padding: 12px; position: relative;
-    overflow: hidden; transition: border-color 0.3s; flex-shrink: 0;
-  }
-  .metric-card:hover { border-color: var(--border); }
-  .metric-card::before {
-    content: ''; position: absolute; top: 0; left: 0; width: 3px; height: 100%;
-    background: linear-gradient(180deg, var(--accent), var(--accent2));
-  }
-  .metric-label {
-    font-family: var(--mono); font-size: 0.6rem; letter-spacing: 0.1em;
-    color: var(--muted2); text-transform: uppercase; margin-bottom: 6px;
-  }
-  .metric-value {
-    font-family: var(--mono); font-size: 1.5rem; font-weight: 700;
-    color: var(--text); line-height: 1;
-  }
-  .metric-value.green { color: var(--success); }
-  .metric-value.warn { color: var(--warn); }
-  .metric-sub { font-family: var(--mono); font-size: 0.6rem; color: var(--muted); margin-top: 4px; }
-  .progress-bar { margin-top: 8px; height: 2px; background: var(--surface); border-radius: 2px; overflow: hidden; }
-  .progress-fill {
-    height: 100%; border-radius: 2px;
-    background: linear-gradient(90deg, var(--accent), var(--accent2));
-    transition: width 1s ease;
-  }
-  .divider { height: 1px; background: var(--border2); margin: 4px 0; flex-shrink: 0; }
-  .system-item {
-    display: flex; justify-content: space-between; align-items: center;
-    padding: 6px 0; font-family: var(--mono); font-size: 0.65rem; flex-shrink: 0;
-  }
-  .system-name { color: var(--muted2); }
-  .badge {
-    padding: 2px 6px; border-radius: 3px; font-size: 0.6rem;
-    letter-spacing: 0.06em; font-family: var(--mono);
-  }
-  .badge.active { background: rgba(0,229,160,0.12); color: var(--success); border: 1px solid rgba(0,229,160,0.2); }
-  .badge.idle { background: rgba(100,130,255,0.1); color: var(--muted2); border: 1px solid var(--border); }
-  .badge.warn { background: rgba(245,158,11,0.12); color: var(--warn); border: 1px solid rgba(245,158,11,0.2); }
-  #center { display: flex; flex-direction: column; position: relative; overflow: hidden; }
-  #center::before {
-    content: ''; position: absolute; top: 50%; left: 50%;
-    transform: translate(-50%, -60%); width: 300px; height: 300px;
-    background: radial-gradient(circle, rgba(79,111,255,0.06) 0%, transparent 70%);
-    pointer-events: none; z-index: 0;
-  }
-  #sphere-wrapper {
-    position: absolute; top: 40%; left: 50%; transform: translate(-50%, -50%);
-    width: 220px; height: 220px; pointer-events: none; opacity: 0.3; z-index: 0;
-  }
-  canvas { width: 100%; height: 100%; }
-  #messages {
-    flex: 1; overflow-y: auto; padding: 16px; display: flex;
-    flex-direction: column; gap: 10px; scrollbar-width: thin;
-    scrollbar-color: var(--border) transparent; position: relative; z-index: 2;
-  }
-  .msg { max-width: 75%; animation: fadeIn 0.3s ease; }
-  @keyframes fadeIn { from { opacity:0; transform:translateY(6px); } to { opacity:1; transform:translateY(0); } }
-  .msg-inner { padding: 10px 14px; border-radius: 8px; font-size: 0.85rem; line-height: 1.5; }
-  .msg.user { align-self: flex-end; }
-  .msg.user .msg-inner { background: rgba(79,111,255,0.15); border: 1px solid rgba(79,111,255,0.25); color: var(--text); }
-  .msg.ai { align-self: flex-start; }
-  .msg.ai .msg-inner { background: var(--surface2); border: 1px solid var(--border); color: var(--text); }
-  .msg.system { align-self: center; }
-  .msg.system .msg-inner {
-    background: transparent; border: none; font-family: var(--mono);
-    font-size: 0.6rem; letter-spacing: 0.1em; color: var(--muted);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 1.5px;
+    color: var(--success);
+    background: rgba(0, 229, 160, 0.08);
+    border: 1px solid rgba(0, 229, 160, 0.2);
+    padding: 6px 12px;
+    border-radius: 4px;
     text-transform: uppercase;
   }
-  .msg-meta { font-family: var(--mono); font-size: 0.6rem; color: var(--muted); margin-top: 4px; padding: 0 2px; }
+
+  .pulse {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--success);
+    box-shadow: 0 0 8px var(--success);
+    animation: pulse 2s infinite;
+  }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.4; transform: scale(0.7); }
+  }
+
+  .time-display {
+    font-family: var(--mono);
+    font-size: 12px;
+    color: var(--text-tertiary);
+  }
+
+  /* Theme Toggle */
+  .theme-toggle {
+    position: relative;
+    width: 56px;
+    height: 28px;
+    background: transparent;
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+  }
+
+  .theme-toggle:hover {
+    border-color: var(--accent);
+    box-shadow: 0 0 12px var(--accent-glow);
+  }
+
+  .theme-toggle-slider {
+    position: absolute;
+    top: 2px;
+    left: 2px;
+    width: 22px;
+    height: 22px;
+    background: var(--accent);
+    border-radius: 50%;
+    transition: transform 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 11px;
+    box-shadow: 0 0 8px var(--accent-glow);
+  }
+
+  .theme-toggle-slider::before {
+    content: '🌙';
+  }
+
+  [data-theme="light"] .theme-toggle-slider {
+    transform: translateX(28px);
+  }
+
+  [data-theme="light"] .theme-toggle-slider::before {
+    content: '☀️';
+  }
+
+  /* Lang Switcher */
+  .lang-switcher {
+    display: flex;
+    gap: 2px;
+    background: transparent;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    overflow: hidden;
+  }
+
+  .lang-btn {
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 1.5px;
+    padding: 6px 12px;
+    color: var(--text-secondary);
+    cursor: pointer;
+    transition: all 0.2s;
+    user-select: none;
+    text-transform: uppercase;
+  }
+
+  .lang-btn:hover { color: var(--accent); }
+
+  .lang-btn.active {
+    background: rgba(96, 165, 250, 0.15);
+    color: var(--accent);
+  }
+
+  /* PANELS */
+  .panel {
+    background: var(--bg-secondary);
+    overflow: hidden;
+    position: relative;
+    z-index: 10;
+    border-right: 1px solid var(--border);
+  }
+
+  .panel:last-child {
+    border-right: none;
+  }
+
+  /* LEFT SIDEBAR */
+  #sidebar-left {
+    display: flex;
+    flex-direction: column;
+    padding: 20px;
+    gap: 12px;
+    overflow-y: auto;
+    scrollbar-width: thin;
+    scrollbar-color: var(--border) transparent;
+  }
+
+  .section-label {
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 2px;
+    color: var(--text-tertiary);
+    text-transform: uppercase;
+    padding: 12px 0 4px;
+  }
+
+  .metric-card {
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 16px;
+    position: relative;
+    overflow: hidden;
+    transition: all 0.3s ease;
+    flex-shrink: 0;
+  }
+
+  .metric-card:hover {
+    border-color: var(--accent);
+    box-shadow: 0 4px 16px rgba(96, 165, 250, 0.15);
+  }
+
+  .metric-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 2px;
+    background: linear-gradient(90deg, var(--accent), var(--accent-bright));
+    opacity: 0;
+    transition: opacity 0.3s ease;
+  }
+
+  .metric-card:hover::before {
+    opacity: 1;
+  }
+
+  .metric-label {
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 1.5px;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    margin-bottom: 8px;
+  }
+
+  .metric-value {
+    font-family: var(--mono);
+    font-size: 28px;
+    font-weight: 700;
+    color: var(--text-primary);
+    line-height: 1;
+  }
+
+  .metric-value.green { color: var(--success); }
+  .metric-value.warn { color: var(--warn); }
+
+  .metric-sub {
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--text-tertiary);
+    margin-top: 6px;
+  }
+
+  .progress-bar {
+    margin-top: 12px;
+    height: 3px;
+    background: var(--bg);
+    border-radius: 3px;
+    overflow: hidden;
+  }
+
+  .progress-fill {
+    height: 100%;
+    border-radius: 3px;
+    background: var(--accent);
+    transition: width 1s ease;
+    box-shadow: 0 0 8px var(--accent-glow);
+  }
+
+  .divider {
+    height: 1px;
+    background: var(--border);
+    margin: 8px 0;
+    flex-shrink: 0;
+  }
+
+  .system-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 0;
+    font-family: var(--mono);
+    font-size: 11px;
+    flex-shrink: 0;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .system-item:last-child {
+    border-bottom: none;
+  }
+
+  .system-name { color: var(--text-secondary); }
+
+  .badge {
+    padding: 3px 8px;
+    border-radius: 4px;
+    font-size: 9px;
+    letter-spacing: 1px;
+    font-family: var(--mono);
+    text-transform: uppercase;
+  }
+
+  .badge.active {
+    background: rgba(0, 229, 160, 0.12);
+    color: var(--success);
+    border: 1px solid rgba(0, 229, 160, 0.2);
+  }
+
+  .badge.idle {
+    background: rgba(96, 165, 250, 0.1);
+    color: var(--text-secondary);
+    border: 1px solid var(--border);
+  }
+
+  .badge.warn {
+    background: rgba(245, 158, 11, 0.12);
+    color: var(--warn);
+    border: 1px solid rgba(245, 158, 11, 0.2);
+  }
+
+  /* CENTER */
+  #center {
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    overflow: hidden;
+  }
+
+  #sphere-wrapper {
+    position: absolute;
+    top: 40%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 220px;
+    height: 220px;
+    pointer-events: none;
+    opacity: 0.3;
+    z-index: 0;
+  }
+
+  canvas {
+    width: 100%;
+    height: 100%;
+  }
+
+  /* Chat */
+  #messages {
+    flex: 1;
+    overflow-y: auto;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    scrollbar-width: thin;
+    scrollbar-color: var(--border) transparent;
+    position: relative;
+    z-index: 2;
+  }
+
+  .msg {
+    max-width: 75%;
+    animation: fadeIn 0.3s ease;
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(6px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .msg-inner {
+    padding: 12px 16px;
+    border-radius: 8px;
+    font-size: 13px;
+    line-height: 1.6;
+    font-weight: 300;
+  }
+
+  .msg.user { align-self: flex-end; }
+  .msg.user .msg-inner {
+    background: rgba(96, 165, 250, 0.15);
+    border: 1px solid rgba(96, 165, 250, 0.25);
+    color: var(--text-primary);
+  }
+
+  .msg.ai { align-self: flex-start; }
+  .msg.ai .msg-inner {
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    color: var(--text-primary);
+  }
+
+  .msg.system { align-self: center; }
+  .msg.system .msg-inner {
+    background: transparent;
+    border: none;
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 1.5px;
+    color: var(--text-tertiary);
+    text-transform: uppercase;
+  }
+
+  .msg-meta {
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--text-tertiary);
+    margin-top: 4px;
+    padding: 0 2px;
+  }
+
   .msg.user .msg-meta { text-align: right; }
+
+  /* Input */
   #input-area {
-    padding: 12px 16px; display: flex; gap: 8px; align-items: center;
-    border-top: 1px solid var(--border2); background: var(--surface2);
-    position: relative; z-index: 2;
+    padding: 16px 20px;
+    display: flex;
+    gap: 12px;
+    align-items: center;
+    border-top: 1px solid var(--border);
+    background: var(--bg-elevated);
+    position: relative;
+    z-index: 2;
   }
+
   #input-area::before {
-    content: '›'; font-family: var(--mono); color: var(--accent);
-    font-size: 1.1rem; flex-shrink: 0;
+    content: '>';
+    font-family: var(--mono);
+    color: var(--accent);
+    font-size: 16px;
+    flex-shrink: 0;
   }
+
   #user-input {
-    flex: 1; background: transparent; border: none; outline: none;
-    color: var(--text); font-family: var(--mono); font-size: 0.8rem;
+    flex: 1;
+    background: transparent;
+    border: none;
+    outline: none;
+    color: var(--text-primary);
+    font-family: var(--mono);
+    font-size: 13px;
     caret-color: var(--accent);
   }
-  #user-input::placeholder { color: var(--muted); }
+
+  #user-input::placeholder {
+    color: var(--text-tertiary);
+  }
+
   #send-btn {
-    background: linear-gradient(135deg, var(--accent), var(--accent2));
-    color: white; border: none; border-radius: 6px; padding: 6px 14px;
-    font-family: var(--mono); font-size: 0.7rem; letter-spacing: 0.08em;
-    cursor: pointer; transition: opacity 0.2s, transform 0.1s; flex-shrink: 0;
+    background: var(--accent);
+    color: var(--bg);
+    border: none;
+    border-radius: 6px;
+    padding: 8px 16px;
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 1.5px;
+    cursor: pointer;
+    transition: all 0.2s;
+    flex-shrink: 0;
+    text-transform: uppercase;
+    font-weight: 600;
   }
-  #send-btn:hover { opacity: 0.85; }
-  #send-btn:active { transform: scale(0.97); }
+
+  #send-btn:hover {
+    background: var(--accent-bright);
+    box-shadow: 0 0 16px var(--accent-glow);
+  }
+
+  #send-btn:active {
+    transform: scale(0.97);
+  }
+
+  /* Voice Button */
+  #voice-btn {
+    background: transparent;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    flex-shrink: 0;
+    transition: all 0.2s;
+    outline: none;
+  }
+
+  #voice-btn:hover {
+    border-color: var(--accent);
+    background: rgba(96, 165, 250, 0.08);
+  }
+
+  #voice-btn svg {
+    width: 14px;
+    height: 14px;
+    fill: var(--text-secondary);
+    transition: fill 0.2s;
+  }
+
+  #voice-btn:hover svg {
+    fill: var(--accent);
+  }
+
+  #voice-btn.listening {
+    border-color: #ef4444;
+    background: rgba(239, 68, 68, 0.1);
+    animation: voicePulse 1.2s ease-in-out infinite;
+  }
+
+  #voice-btn.listening svg {
+    fill: #ef4444;
+  }
+
+  @keyframes voicePulse {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.4); }
+    50% { box-shadow: 0 0 0 6px rgba(239, 68, 68, 0); }
+  }
+
+  #voice-status {
+    font-family: var(--mono);
+    font-size: 9px;
+    letter-spacing: 1px;
+    color: var(--text-tertiary);
+    white-space: nowrap;
+    display: none;
+    text-transform: uppercase;
+  }
+
+  #voice-status.visible { display: block; }
+  #voice-status.active { color: #ef4444; }
+
+  #voice-btn.unsupported {
+    opacity: 0.3;
+    cursor: not-allowed;
+  }
+
+  /* RIGHT SIDEBAR */
   #sidebar-right {
-    display: flex; flex-direction: column; padding: 16px; gap: 8px;
-    overflow-y: auto; scrollbar-width: thin; scrollbar-color: var(--border) transparent;
+    display: flex;
+    flex-direction: column;
+    padding: 20px;
+    gap: 12px;
+    overflow-y: auto;
+    scrollbar-width: thin;
+    scrollbar-color: var(--border) transparent;
   }
+
   .agent-card {
-    background: var(--surface2); border: 1px solid var(--border2);
-    border-radius: 8px; padding: 12px; transition: border-color 0.3s, background 0.3s;
-    cursor: pointer; position: relative; overflow: hidden; flex-shrink: 0;
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 16px;
+    transition: all 0.3s ease;
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+    flex-shrink: 0;
   }
-  .agent-card:hover { border-color: var(--border); background: rgba(79,111,255,0.04); }
-  .agent-card.running { border-color: rgba(79,111,255,0.3); }
+
+  .agent-card:hover {
+    border-color: var(--accent);
+    box-shadow: 0 4px 16px rgba(96, 165, 250, 0.15);
+  }
+
+  .agent-card.running {
+    border-color: rgba(96, 165, 250, 0.3);
+  }
+
   .agent-card.running::after {
-    content: ''; position: absolute; top: 0; left: -100%; width: 60%; height: 1px;
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 60%;
+    height: 2px;
     background: linear-gradient(90deg, transparent, var(--accent), transparent);
     animation: scan 2.5s linear infinite;
   }
-  @keyframes scan { from { left: -60%; } to { left: 160%; } }
-  .agent-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; }
-  .agent-name { font-family: var(--sans); font-weight: 600; font-size: 0.8rem; color: var(--text); }
-  .agent-role { font-family: var(--mono); font-size: 0.6rem; color: var(--muted2); margin-bottom: 8px; }
+
+  @keyframes scan {
+    from { left: -60%; }
+    to { left: 160%; }
+  }
+
+  .agent-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+  }
+
+  .agent-name {
+    font-family: var(--sans);
+    font-weight: 600;
+    font-size: 14px;
+    color: var(--text-primary);
+  }
+
+  .agent-role {
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--text-secondary);
+    margin-bottom: 12px;
+    letter-spacing: 0.5px;
+  }
+
   .agent-stat {
-    display: flex; justify-content: space-between; font-family: var(--mono);
-    font-size: 0.6rem; color: var(--muted);
+    display: flex;
+    justify-content: space-between;
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--text-tertiary);
   }
+
   .alert-card {
-    background: rgba(245,158,11,0.06); border: 1px solid rgba(245,158,11,0.2);
-    border-radius: 8px; padding: 10px 12px; font-family: var(--mono);
-    font-size: 0.65rem; color: var(--warn); display: flex; gap: 8px;
-    align-items: flex-start; flex-shrink: 0;
+    background: rgba(245, 158, 11, 0.06);
+    border: 1px solid rgba(245, 158, 11, 0.2);
+    border-radius: 8px;
+    padding: 12px 14px;
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--warn);
+    display: flex;
+    gap: 10px;
+    align-items: flex-start;
+    flex-shrink: 0;
   }
-  .alert-icon { flex-shrink: 0; opacity: 0.7; }
-  .lang-switcher {
-    display: flex; gap: 1px; background: var(--border2);
-    border: 1px solid var(--border); border-radius: 6px; overflow: hidden;
+
+  .alert-icon {
+    flex-shrink: 0;
+    opacity: 0.7;
   }
-  .lang-btn {
-    font-family: var(--mono); font-size: 0.62rem; letter-spacing: 0.1em;
-    padding: 4px 10px; color: var(--muted2); cursor: pointer;
-    transition: all 0.2s; user-select: none; text-transform: uppercase;
+
+  /* Responsive */
+  @media (max-width: 1024px) {
+    body {
+      grid-template-columns: 1fr;
+      grid-template-rows: 64px 1fr;
+    }
+
+    #sidebar-left,
+    #sidebar-right {
+      display: none;
+    }
   }
-  .lang-btn:hover { color: var(--text); }
-  .lang-btn.active { background: rgba(79,111,255,0.15); color: var(--accent); }
-  #voice-btn {
-    background: transparent; border: 1px solid var(--border);
-    border-radius: 6px; width: 32px; height: 32px; display: flex;
-    align-items: center; justify-content: center; cursor: pointer;
-    flex-shrink: 0; transition: border-color 0.2s, background 0.2s;
-    position: relative; outline: none;
-  }
-  #voice-btn:hover { border-color: var(--accent); background: rgba(79,111,255,0.08); }
-  #voice-btn svg { width: 14px; height: 14px; fill: var(--muted2); transition: fill 0.2s; flex-shrink: 0; }
-  #voice-btn:hover svg { fill: var(--accent); }
-  #voice-btn.listening {
-    border-color: #ef4444; background: rgba(239,68,68,0.1);
-    animation: voicePulse 1.2s ease-in-out infinite;
-  }
-  #voice-btn.listening svg { fill: #ef4444; }
-  @keyframes voicePulse { 0%,100% { box-shadow: 0 0 0 0 rgba(239,68,68,0.4); } 50% { box-shadow: 0 0 0 6px rgba(239,68,68,0); } }
-  #voice-status {
-    font-family: var(--mono); font-size: 0.58rem; letter-spacing: 0.08em;
-    color: var(--muted); white-space: nowrap; transition: color 0.2s; display: none;
-  }
-  #voice-status.visible { display: block; }
-  #voice-status.active { color: #ef4444; }
-  #voice-btn.unsupported { opacity: 0.3; cursor: not-allowed; }
-  #voice-btn.unsupported:hover { border-color: var(--border); background: transparent; }
-  /* Estado de pensamiento */
-  #sphere-wrapper.thinking { opacity: 0.9; }
-  #sphere-wrapper.speaking { opacity: 1; }
 </style>
 </head>
 <body>
 
 <!-- HEADER -->
 <header>
-  <div class="logo">SuperNova <span id="logo-sub">INTELLIGENCE STACK CORE v2.1</span></div>
-  <div class="nav-center">
-    <div class="nav-tab active" onclick="setTab(this)" data-i18n="nav.overview">OVERVIEW</div>
-    <div class="nav-tab" onclick="setTab(this)" data-i18n="nav.agents">AGENTS</div>
-    <div class="nav-tab" onclick="setTab(this)" data-i18n="nav.systems">SYSTEMS</div>
-    <div class="nav-tab" onclick="setTab(this)" data-i18n="nav.logs">LOGS</div>
+  <div class="logo">
+    <strong>SuperNova</strong>
+    <span class="logo-sub">Intelligence Stack Core v2.1</span>
   </div>
+
+  <div class="nav-center">
+    <div class="nav-tab active" onclick="setTab(this)" data-i18n="nav.overview">Overview</div>
+    <div class="nav-tab" onclick="setTab(this)" data-i18n="nav.agents">Agents</div>
+    <div class="nav-tab" onclick="setTab(this)" data-i18n="nav.systems">Systems</div>
+    <div class="nav-tab" onclick="setTab(this)" data-i18n="nav.logs">Logs</div>
+  </div>
+
   <div class="header-right">
     <div class="lang-switcher">
-      <div class="lang-btn active" onclick="setLang('en')">EN</div>
-      <div class="lang-btn" onclick="setLang('es')">ES</div>
+      <div class="lang-btn active" onclick="setLangWithVoice('en')">EN</div>
+      <div class="lang-btn" onclick="setLangWithVoice('es')">ES</div>
     </div>
     <div class="status-pill">
       <div class="pulse"></div>
-      <span id="status-text">ONLINE</span>
+      <span id="status-text">Online</span>
+    </div>
+    <div class="theme-toggle" id="themeToggle">
+      <div class="theme-toggle-slider"></div>
     </div>
     <div class="time-display" id="clock">--:--:--</div>
   </div>
@@ -273,281 +781,463 @@
 <!-- LEFT SIDEBAR -->
 <div id="sidebar-left" class="panel">
   <div class="section-label" data-i18n="perf.title">Performance</div>
+
   <div class="metric-card">
     <div class="metric-label" data-i18n="perf.efficiency">Efficiency Score</div>
-    <div class="metric-value green" id="efficiency-score">92.4%</div>
+    <div class="metric-value green">92.4%</div>
     <div class="metric-sub">↑ +1.8% <span data-i18n="perf.vs">vs last cycle</span></div>
-    <div class="progress-bar"><div class="progress-fill" id="efficiency-bar" style="width:92%"></div></div>
+    <div class="progress-bar"><div class="progress-fill" style="width:92%"></div></div>
   </div>
+
   <div class="metric-card">
     <div class="metric-label" data-i18n="perf.active">Active Systems</div>
-    <div class="metric-value" id="active-systems">7</div>
+    <div class="metric-value">7</div>
     <div class="metric-sub"><span data-i18n="perf.of">of 9 modules online</span></div>
-    <div class="progress-bar"><div class="progress-fill" id="systems-bar" style="width:77%"></div></div>
+    <div class="progress-bar"><div class="progress-fill" style="width:77%"></div></div>
   </div>
+
   <div class="metric-card">
     <div class="metric-label" data-i18n="perf.alerts">Open Alerts</div>
-    <div class="metric-value warn" id="alert-count">2</div>
+    <div class="metric-value warn">2</div>
     <div class="metric-sub" data-i18n="perf.attention">Requires attention</div>
   </div>
+
   <div class="divider"></div>
   <div class="section-label" data-i18n="sys.title">Systems</div>
-  <div class="system-item"><span class="system-name">Inference</span><span class="badge active" data-i18n="badge.active">ACTIVE</span></div>
-  <div class="system-item"><span class="system-name">Memory</span><span class="badge active" data-i18n="badge.active">ACTIVE</span></div>
-  <div class="system-item"><span class="system-name">Orchestrator</span><span class="badge idle" data-i18n="badge.idle">IDLE</span></div>
-  <div class="system-item"><span class="system-name">Scheduler</span><span class="badge warn" data-i18n="badge.stale">STALE</span></div>
-  <div class="system-item"><span class="system-name">Data Layer</span><span class="badge active" data-i18n="badge.active">ACTIVE</span></div>
+
+  <div class="system-item">
+    <span class="system-name">Inference</span>
+    <span class="badge active" data-i18n="badge.active">Active</span>
+  </div>
+  <div class="system-item">
+    <span class="system-name">Memory</span>
+    <span class="badge active" data-i18n="badge.active">Active</span>
+  </div>
+  <div class="system-item">
+    <span class="system-name">Orchestrator</span>
+    <span class="badge idle" data-i18n="badge.idle">Idle</span>
+  </div>
+  <div class="system-item">
+    <span class="system-name">Scheduler</span>
+    <span class="badge warn" data-i18n="badge.stale">Stale</span>
+  </div>
+  <div class="system-item">
+    <span class="system-name">Data Layer</span>
+    <span class="badge active" data-i18n="badge.active">Active</span>
+  </div>
 </div>
 
 <!-- CENTER CHAT -->
 <div id="center" class="panel">
-  <div id="sphere-wrapper"><canvas id="sphere"></canvas></div>
+  <div id="sphere-wrapper">
+    <canvas id="sphere"></canvas>
+  </div>
+
   <div id="messages">
     <div class="msg system"><div class="msg-inner" data-i18n="chat.init">Session initialized — SuperNova ready</div></div>
+
     <div class="msg ai">
       <div class="msg-inner" data-i18n="chat.welcome">All core systems operational. I have 7 active modules running. How can I assist?</div>
-      <div class="msg-meta">NOVA · <span class="msg-time"></span></div>
+      <div class="msg-meta">NOVA · 14:30:02</div>
+    </div>
+
+    <div class="msg user">
+      <div class="msg-inner" data-i18n="chat.user1">Run diagnostics on the scheduler module.</div>
+      <div class="msg-meta" data-i18n-sender="you">YOU · 14:30:18</div>
+    </div>
+
+    <div class="msg ai">
+      <div class="msg-inner" data-i18n="chat.ai1">Scheduler shows stale heartbeat — last ping 4m 22s ago. Possible causes: thread deadlock, config drift, or upstream dependency failure. Recommend forced restart. Proceed?</div>
+      <div class="msg-meta">NOVA · 14:30:21</div>
     </div>
   </div>
+
   <div id="input-area">
     <input id="user-input" placeholder="Command or query..." autocomplete="off" data-i18n-placeholder="input.placeholder" />
     <span id="voice-status"></span>
     <button id="voice-btn" title="Voice input">
-      <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M12 1a4 4 0 0 1 4 4v7a4 4 0 0 1-8 0V5a4 4 0 0 1 4-4zm-1 4v7a1 1 0 0 0 2 0V5a1 1 0 0 0-2 0zM7 11a5 5 0 0 0 10 0h2a7 7 0 0 1-6 6.93V21h2v2H9v-2h2v-3.07A7 7 0 0 1 5 11h2z"/></svg>
+      <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+        <path d="M12 1a4 4 0 0 1 4 4v7a4 4 0 0 1-8 0V5a4 4 0 0 1 4-4zm-1 4v7a1 1 0 0 0 2 0V5a1 1 0 0 0-2 0zM7 11a5 5 0 0 0 10 0h2a7 7 0 0 1-6 6.93V21h2v2H9v-2h2v-3.07A7 7 0 0 1 5 11h2z"/>
+      </svg>
     </button>
-    <button id="send-btn" data-i18n="input.send">SEND</button>
+    <button id="send-btn" data-i18n="input.send">Send</button>
   </div>
 </div>
 
 <!-- RIGHT SIDEBAR -->
 <div id="sidebar-right" class="panel">
   <div class="section-label" data-i18n="agents.title">Agents</div>
+
   <div class="agent-card running">
-    <div class="agent-header"><div class="agent-name">Nova</div><span class="badge active" data-i18n="badge.running">RUNNING</span></div>
+    <div class="agent-header">
+      <div class="agent-name">Nova</div>
+      <span class="badge active" data-i18n="badge.running">Running</span>
+    </div>
     <div class="agent-role" data-i18n="agents.nova.role">Primary Reasoning Core</div>
-    <div class="agent-stat"><span><span data-i18n="agents.tasks">Tasks</span>: <span id="nova-tasks">12</span></span><span><span data-i18n="agents.latency">Latency</span>: <span id="nova-latency">280ms</span></span></div>
+    <div class="agent-stat">
+      <span><span data-i18n="agents.tasks">Tasks</span>: 12</span>
+      <span><span data-i18n="agents.latency">Latency</span>: 280ms</span>
+    </div>
   </div>
+
   <div class="agent-card running">
-    <div class="agent-header"><div class="agent-name">Analysis</div><span class="badge active" data-i18n="badge.running">RUNNING</span></div>
+    <div class="agent-header">
+      <div class="agent-name">Analysis</div>
+      <span class="badge active" data-i18n="badge.running">Running</span>
+    </div>
     <div class="agent-role" data-i18n="agents.analysis.role">Data Intelligence Layer</div>
-    <div class="agent-stat"><span><span data-i18n="agents.tasks">Tasks</span>: 4</span><span><span data-i18n="agents.latency">Latency</span>: 540ms</span></div>
+    <div class="agent-stat">
+      <span><span data-i18n="agents.tasks">Tasks</span>: 4</span>
+      <span><span data-i18n="agents.latency">Latency</span>: 540ms</span>
+    </div>
   </div>
+
   <div class="agent-card">
-    <div class="agent-header"><div class="agent-name">Ops</div><span class="badge idle" data-i18n="badge.idle">IDLE</span></div>
+    <div class="agent-header">
+      <div class="agent-name">Ops</div>
+      <span class="badge idle" data-i18n="badge.idle">Idle</span>
+    </div>
     <div class="agent-role" data-i18n="agents.ops.role">System Operations</div>
-    <div class="agent-stat"><span><span data-i18n="agents.tasks">Tasks</span>: 0</span><span><span data-i18n="agents.latency">Latency</span>: —</span></div>
+    <div class="agent-stat">
+      <span><span data-i18n="agents.tasks">Tasks</span>: 0</span>
+      <span><span data-i18n="agents.latency">Latency</span>: —</span>
+    </div>
   </div>
+
   <div class="agent-card running">
-    <div class="agent-header"><div class="agent-name">Memory</div><span class="badge active" data-i18n="badge.running">RUNNING</span></div>
+    <div class="agent-header">
+      <div class="agent-name">Memory</div>
+      <span class="badge active" data-i18n="badge.running">Running</span>
+    </div>
     <div class="agent-role" data-i18n="agents.memory.role">Context & Retrieval</div>
-    <div class="agent-stat"><span>Vectors: <span id="memory-vectors">18.4K</span></span><span><span data-i18n="agents.hitrate">Hit rate</span>: 91%</span></div>
+    <div class="agent-stat">
+      <span>Vectors: 18.4K</span>
+      <span><span data-i18n="agents.hitrate">Hit rate</span>: 91%</span>
+    </div>
   </div>
+
   <div class="divider"></div>
   <div class="section-label" data-i18n="alerts.title">Alerts</div>
-  <div id="alerts-container">
-    <div class="alert-card"><span class="alert-icon">⚠</span><span data-i18n="alerts.one">Scheduler stale — 4m without heartbeat</span></div>
-    <div class="alert-card"><span class="alert-icon">⚠</span><span data-i18n="alerts.two">Memory index rebuild pending</span></div>
+
+  <div class="alert-card">
+    <span class="alert-icon">⚠</span>
+    <span data-i18n="alerts.one">Scheduler stale — 4m without heartbeat</span>
+  </div>
+
+  <div class="alert-card">
+    <span class="alert-icon">⚠</span>
+    <span data-i18n="alerts.two">Memory index rebuild pending</span>
   </div>
 </div>
 
 <script>
-  // ── i18n dictionary ──────────────────────────────────────────────
+  // i18n dictionary
   const dict = {
     en: {
-      'nav.overview': 'OVERVIEW', 'nav.agents': 'AGENTS', 'nav.systems': 'SYSTEMS', 'nav.logs': 'LOGS',
-      'perf.title': 'Performance', 'perf.efficiency': 'Efficiency Score', 'perf.vs': 'vs last cycle',
-      'perf.active': 'Active Systems', 'perf.of': 'of 9 modules online', 'perf.alerts': 'Open Alerts',
-      'perf.attention': 'Requires attention', 'sys.title': 'Systems', 'badge.active': 'ACTIVE',
-      'badge.idle': 'IDLE', 'badge.stale': 'STALE', 'badge.running': 'RUNNING',
+      'nav.overview': 'Overview',
+      'nav.agents': 'Agents',
+      'nav.systems': 'Systems',
+      'nav.logs': 'Logs',
+      'perf.title': 'Performance',
+      'perf.efficiency': 'Efficiency Score',
+      'perf.vs': 'vs last cycle',
+      'perf.active': 'Active Systems',
+      'perf.of': 'of 9 modules online',
+      'perf.alerts': 'Open Alerts',
+      'perf.attention': 'Requires attention',
+      'sys.title': 'Systems',
+      'badge.active': 'Active',
+      'badge.idle': 'Idle',
+      'badge.stale': 'Stale',
+      'badge.running': 'Running',
       'chat.init': 'Session initialized — SuperNova ready',
       'chat.welcome': 'All core systems operational. I have 7 active modules running. How can I assist?',
-      'input.placeholder': 'Command or query...', 'input.send': 'SEND', 'agents.title': 'Agents',
-      'agents.nova.role': 'Primary Reasoning Core', 'agents.analysis.role': 'Data Intelligence Layer',
-      'agents.ops.role': 'System Operations', 'agents.memory.role': 'Context & Retrieval',
-      'agents.tasks': 'Tasks', 'agents.latency': 'Latency', 'agents.hitrate': 'Hit rate',
-      'alerts.title': 'Alerts', 'alerts.one': 'Scheduler stale — 4m without heartbeat',
-      'alerts.two': 'Memory index rebuild pending', 'you': 'YOU',
-      'voice.listening': 'LISTENING...', 'voice.noSupport': 'NOT SUPPORTED', 'voice.error': 'MIC ERROR',
+      'chat.user1': 'Run diagnostics on the scheduler module.',
+      'chat.ai1': 'Scheduler shows stale heartbeat — last ping 4m 22s ago. Possible causes: thread deadlock, config drift, or upstream dependency failure. Recommend forced restart. Proceed?',
+      'input.placeholder': 'Command or query...',
+      'input.send': 'Send',
+      'agents.title': 'Agents',
+      'agents.nova.role': 'Primary Reasoning Core',
+      'agents.analysis.role': 'Data Intelligence Layer',
+      'agents.ops.role': 'System Operations',
+      'agents.memory.role': 'Context & Retrieval',
+      'agents.tasks': 'Tasks',
+      'agents.latency': 'Latency',
+      'agents.hitrate': 'Hit rate',
+      'alerts.title': 'Alerts',
+      'alerts.one': 'Scheduler stale — 4m without heartbeat',
+      'alerts.two': 'Memory index rebuild pending',
+      'you': 'YOU',
+      'voice.listening': 'Listening...',
+      'voice.error': 'Mic Error',
     },
     es: {
-      'nav.overview': 'RESUMEN', 'nav.agents': 'AGENTES', 'nav.systems': 'SISTEMAS', 'nav.logs': 'REGISTROS',
-      'perf.title': 'Rendimiento', 'perf.efficiency': 'Índice de Eficiencia', 'perf.vs': 'vs ciclo anterior',
-      'perf.active': 'Sistemas Activos', 'perf.of': 'de 9 módulos en línea', 'perf.alerts': 'Alertas Abiertas',
-      'perf.attention': 'Requiere atención', 'sys.title': 'Sistemas', 'badge.active': 'ACTIVO',
-      'badge.idle': 'INACTIVO', 'badge.stale': 'DETENIDO', 'badge.running': 'EN CURSO',
+      'nav.overview': 'Resumen',
+      'nav.agents': 'Agentes',
+      'nav.systems': 'Sistemas',
+      'nav.logs': 'Registros',
+      'perf.title': 'Rendimiento',
+      'perf.efficiency': 'Índice de Eficiencia',
+      'perf.vs': 'vs ciclo anterior',
+      'perf.active': 'Sistemas Activos',
+      'perf.of': 'de 9 módulos en línea',
+      'perf.alerts': 'Alertas Abiertas',
+      'perf.attention': 'Requiere atención',
+      'sys.title': 'Sistemas',
+      'badge.active': 'Activo',
+      'badge.idle': 'Inactivo',
+      'badge.stale': 'Detenido',
+      'badge.running': 'En Curso',
       'chat.init': 'Sesión iniciada — SuperNova lista',
       'chat.welcome': 'Todos los sistemas centrales operativos. Tengo 7 módulos activos. ¿En qué puedo asistirte?',
-      'input.placeholder': 'Comando o consulta...', 'input.send': 'ENVIAR', 'agents.title': 'Agentes',
-      'agents.nova.role': 'Núcleo de Razonamiento Principal', 'agents.analysis.role': 'Capa de Inteligencia de Datos',
-      'agents.ops.role': 'Operaciones del Sistema', 'agents.memory.role': 'Contexto y Recuperación',
-      'agents.tasks': 'Tareas', 'agents.latency': 'Latencia', 'agents.hitrate': 'Tasa de acierto',
-      'alerts.title': 'Alertas', 'alerts.one': 'Scheduler detenido — 4m sin heartbeat',
-      'alerts.two': 'Reindexación de memoria pendiente', 'you': 'TÚ',
-      'voice.listening': 'ESCUCHANDO...', 'voice.noSupport': 'NO SOPORTADO', 'voice.error': 'ERROR MIC',
+      'chat.user1': 'Ejecutar diagnóstico en el módulo de scheduler.',
+      'chat.ai1': 'El scheduler muestra heartbeat inactivo — último ping hace 4m 22s. Causas posibles: deadlock de hilo, deriva de configuración, o fallo de dependencia upstream. Se recomienda reinicio forzado. ¿Proceder?',
+      'input.placeholder': 'Comando o consulta...',
+      'input.send': 'Enviar',
+      'agents.title': 'Agentes',
+      'agents.nova.role': 'Núcleo de Razonamiento Principal',
+      'agents.analysis.role': 'Capa de Inteligencia de Datos',
+      'agents.ops.role': 'Operaciones del Sistema',
+      'agents.memory.role': 'Contexto y Recuperación',
+      'agents.tasks': 'Tareas',
+      'agents.latency': 'Latencia',
+      'agents.hitrate': 'Tasa de acierto',
+      'alerts.title': 'Alertas',
+      'alerts.one': 'Scheduler detenido — 4m sin heartbeat',
+      'alerts.two': 'Reindexación de memoria pendiente',
+      'you': 'TÚ',
+      'voice.listening': 'Escuchando...',
+      'voice.error': 'Error Mic',
     }
   };
 
-  let currentLang = 'es'; // Default a español para el usuario
+  const responses = {
+    en: [
+      'Processing instruction. Operative module executing.',
+      'Diagnostics complete. No anomalies detected in core.',
+      'Confirmed. Initiating controlled restart sequence.',
+      'Analyzing dataset. Estimated time: 2.4s.',
+      'Instruction logged. Ops agent queued for activation.',
+      'Heartbeat restored. Scheduler operational again.',
+      'Verification complete. All nodes responding within threshold.'
+    ],
+    es: [
+      'Procesando instrucción. Módulo operativo en ejecución.',
+      'Diagnóstico completado. Sin anomalías detectadas en el core.',
+      'Confirmado. Iniciando secuencia de reinicio controlado.',
+      'Analizando dataset. Tiempo estimado: 2.4s.',
+      'Instrucción registrada. Agente Ops en cola de activación.',
+      'Heartbeat restaurado. Scheduler operativo nuevamente.',
+      'Verificación completada. Todos los nodos respondiendo dentro del umbral.'
+    ]
+  };
 
-  function t(key) { return dict[currentLang][key] || dict['en'][key] || key; }
+  let currentLang = 'en';
+
+  function t(key) {
+    return dict[currentLang][key] || dict['en'][key] || key;
+  }
 
   function applyLang() {
-    document.querySelectorAll('[data-i18n]').forEach(el => { el.textContent = t(el.dataset.i18n); });
-    document.querySelectorAll('[data-i18n-placeholder]').forEach(el => { el.placeholder = t(el.dataset.i18nPlaceholder); });
-    document.getElementById('logo-sub').textContent = 'INTELLIGENCE STACK CORE v2.1';
-    document.querySelectorAll('.msg-meta').forEach(el => {
-      if (el.textContent.includes('YOU')) el.textContent = t('you') + el.textContent.substring(3);
+    document.querySelectorAll('[data-i18n]').forEach(el => {
+      el.textContent = t(el.dataset.i18n);
+    });
+    document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
+      el.placeholder = t(el.dataset.i18nPlaceholder);
+    });
+    document.querySelectorAll('[data-i18n-sender]').forEach(el => {
+      el.textContent = t('you') + ' · 14:30:18';
     });
   }
 
-  function setLang(lang) {
-    currentLang = lang;
-    document.querySelectorAll('.lang-btn').forEach(b => b.classList.remove('active'));
-    document.querySelector(`.lang-btn[onclick="setLang('${lang}')"]`).classList.add('active');
-    applyLang();
-    if (window.recognition) window.recognition.lang = lang === 'es' ? 'es-ES' : 'en-US';
-  }
+  // Theme Toggle
+  const themeToggle = document.getElementById('themeToggle');
+  const html = document.documentElement;
 
-  // ── Clock ─────────────────────────────────────────────────────────
+  const currentTheme = localStorage.getItem('theme') || 'dark';
+  html.setAttribute('data-theme', currentTheme);
+
+  themeToggle.addEventListener('click', () => {
+    const theme = html.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+    html.setAttribute('data-theme', theme);
+    localStorage.setItem('theme', theme);
+  });
+
+  // Clock
   function updateClock() {
     document.getElementById('clock').textContent = new Date().toTimeString().slice(0, 8);
-    document.querySelectorAll('.msg-time').forEach(el => {
-      el.textContent = new Date().toTimeString().slice(0, 8);
-    });
   }
-  setInterval(updateClock, 1000); updateClock();
+  setInterval(updateClock, 1000);
+  updateClock();
 
-  // ── Nav tabs ──────────────────────────────────────────────────────
+  // Nav tabs
   function setTab(el) {
     document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
     el.classList.add('active');
   }
 
-  // ── Sphere Animation ───────────────────────────────────────────────
+  // Sphere
   const canvas = document.getElementById('sphere');
   const ctx = canvas.getContext('2d');
+
   function resize() {
     const rect = canvas.parentElement.getBoundingClientRect();
-    canvas.width = rect.width; canvas.height = rect.height;
+    canvas.width = rect.width;
+    canvas.height = rect.height;
   }
-  resize(); window.addEventListener('resize', resize);
-  let tick = 0; const particles = [];
+  resize();
+  window.addEventListener('resize', resize);
+
+  let tick = 0;
+  const particles = [];
+
   for (let i = 0; i < 160; i++) {
-    const phi = Math.acos(2 * Math.random() - 1), theta = 2 * Math.PI * Math.random();
-    particles.push({ x: Math.cos(theta) * Math.sin(phi), y: Math.sin(theta) * Math.sin(phi), z: Math.cos(phi), size: Math.random() * 1.5 + 0.5 });
+    const phi = Math.acos(2 * Math.random() - 1);
+    const theta = 2 * Math.PI * Math.random();
+    particles.push({
+      x: Math.cos(theta) * Math.sin(phi),
+      y: Math.sin(theta) * Math.sin(phi),
+      z: Math.cos(phi),
+      size: Math.random() * 1.5 + 0.5
+    });
   }
+
   function draw() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
-    const cx = canvas.width / 2, cy = canvas.height / 2, r = 80; tick += 0.004;
+    const cx = canvas.width / 2;
+    const cy = canvas.height / 2;
+    const r = 80;
+    tick += 0.004;
+
     const sorted = [...particles].sort((a, b) => {
-      const az = a.z * Math.cos(tick) + a.x * Math.sin(tick), bz = b.z * Math.cos(tick) + b.x * Math.sin(tick);
+      const az = a.z * Math.cos(tick) + a.x * Math.sin(tick);
+      const bz = b.z * Math.cos(tick) + b.x * Math.sin(tick);
       return az - bz;
     });
+
     sorted.forEach(p => {
-      const rx = p.x * Math.cos(tick) - p.z * Math.sin(tick), ry = p.y, rz = p.x * Math.sin(tick) + p.z * Math.cos(tick);
-      const x = cx + rx * r, y = cy + ry * r, depth = (rz + 1) / 2;
-      const alpha = 0.2 + depth * 0.8, size = p.size * (0.5 + depth * 0.8);
-      ctx.beginPath(); ctx.arc(x, y, size, 0, Math.PI * 2);
-      ctx.fillStyle = `rgba(${79 + Math.round(depth * 60)}, ${111 + Math.round(depth * 40)}, 255, ${alpha})`;
+      const rx = p.x * Math.cos(tick) - p.z * Math.sin(tick);
+      const ry = p.y;
+      const rz = p.x * Math.sin(tick) + p.z * Math.cos(tick);
+      const x = cx + rx * r;
+      const y = cy + ry * r;
+      const depth = (rz + 1) / 2;
+      const alpha = 0.2 + depth * 0.8;
+      const size = p.size * (0.5 + depth * 0.8);
+      ctx.beginPath();
+      ctx.arc(x, y, size, 0, Math.PI * 2);
+      ctx.fillStyle = `rgba(${96 + Math.round(depth * 51)}, ${165 + Math.round(depth * 32)}, 250, ${alpha})`;
       ctx.fill();
     });
+
     requestAnimationFrame(draw);
   }
   draw();
 
-  // ── Chat + API Connection ─────────────────────────────────────────
-  const input = document.getElementById('user-input'), btn = document.getElementById('send-btn'), messages = document.getElementById('messages');
-  const sphereWrapper = document.getElementById('sphere-wrapper'), statusDot = document.getElementById('status-dot'), statusText = document.getElementById('status-text');
-  const latencyEl = document.getElementById('nova-latency');
+  // Chat
+  const input = document.getElementById('user-input');
+  const btn = document.getElementById('send-btn');
+  const messages = document.getElementById('messages');
 
   function addMsg(text, type, sender = '') {
-    const wrapper = document.createElement('div'); wrapper.className = `msg ${type}`;
+    const wrapper = document.createElement('div');
+    wrapper.className = `msg ${type}`;
     const now = new Date().toTimeString().slice(0, 8);
-    wrapper.innerHTML = `<div class="msg-inner">${text.replace(/\n/g, '<br>')}</div>${type !== 'system' ? `<div class="msg-meta">${sender} · <span class="msg-time">${now}</span></div>` : ''}`;
-    messages.appendChild(wrapper); messages.scrollTop = messages.scrollHeight;
+    wrapper.innerHTML = `
+      <div class="msg-inner">${text}</div>
+      ${type !== 'system' ? `<div class="msg-meta">${sender} · ${now}</div>` : ''}
+    `;
+    messages.appendChild(wrapper);
+    messages.scrollTop = messages.scrollHeight;
   }
 
-  async function sendMessage() {
-    const text = input.value.trim(); if (!text) return;
-    addMsg(text, 'user', t('you')); input.value = ''; btn.disabled = true;
-    sphereWrapper.classList.add('thinking'); sphereWrapper.classList.remove('speaking');
-
-    const start = performance.now();
-    try {
-      const res = await fetch('/chat', {
-        method: 'POST', headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ query: text, history: [] })
-      });
-      const data = await res.json();
-      const ms = Math.round(performance.now() - start);
-      if (latencyEl) latencyEl.textContent = `${ms}ms`;
-      sphereWrapper.classList.remove('thinking'); sphereWrapper.classList.add('speaking');
-      setTimeout(() => { addMsg(data.response, 'ai', 'NOVA'); sphereWrapper.classList.remove('speaking'); }, 400);
-    } catch (err) {
-      addMsg('❌ No se pudo conectar con SuperNova. Verifica que la API esté corriendo.', 'system');
-      sphereWrapper.classList.remove('thinking', 'speaking');
-      if (statusDot) { statusDot.className = 'pulse'; statusText.textContent = 'OFFLINE'; }
-    } finally { btn.disabled = false; setTimeout(() => sphereWrapper.classList.remove('thinking', 'speaking'), 1500); }
+  function sendMessage() {
+    const text = input.value.trim();
+    if (!text) return;
+    input.value = '';
+    addMsg(text, 'user', t('you'));
+    setTimeout(() => {
+      const pool = responses[currentLang];
+      addMsg(pool[Math.floor(Math.random() * pool.length)], 'ai', 'NOVA');
+    }, 600);
   }
 
   btn.addEventListener('click', sendMessage);
   input.addEventListener('keydown', e => { if (e.key === 'Enter') sendMessage(); });
 
-  // ── Health Check ─────────────────────────────────────────────────
-  async function checkHealth() {
-    try {
-      await fetch('/health');
-      if (statusDot) { statusDot.className = 'pulse'; statusDot.style.background = 'var(--success)'; statusDot.style.boxShadow = '0 0 8px var(--success)'; statusText.textContent = 'ONLINE'; }
-    } catch {
-      if (statusDot) { statusDot.className = 'pulse'; statusDot.style.background = 'var(--warn)'; statusDot.style.boxShadow = '0 0 8px var(--warn)'; statusText.textContent = 'OFFLINE'; }
-    }
-  }
-  setInterval(checkHealth, 5000); checkHealth();
+  // Voice Recognition
+  const voiceBtn = document.getElementById('voice-btn');
+  const voiceStatus = document.getElementById('voice-status');
 
-  // ── Voice Recognition ─────────────────────────────────────────────
-  const voiceBtn = document.getElementById('voice-btn'), voiceStatus = document.getElementById('voice-status');
   const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-  let recognition = null, isListening = false;
-  if (!SpeechRecognition) { voiceBtn.classList.add('unsupported'); voiceBtn.title = 'Speech Recognition not supported'; }
-  else {
-    recognition = new SpeechRecognition(); recognition.continuous = false; recognition.interimResults = true;
-    recognition.onstart = () => { isListening = true; voiceBtn.classList.add('listening'); voiceStatus.textContent = t('voice.listening'); voiceStatus.classList.add('visible', 'active'); };
-    recognition.onresult = (e) => { let interim = '', final = ''; for (let i = e.resultIndex; i < e.results.length; i++) { const txt = e.results[i][0].transcript; if (e.results[i].isFinal) final += txt; else interim += txt; } input.value = final || interim; };
-    recognition.onend = () => { isListening = false; voiceBtn.classList.remove('listening'); voiceStatus.classList.remove('visible', 'active'); if (input.value.trim()) sendMessage(); };
-    recognition.onerror = (e) => { isListening = false; voiceBtn.classList.remove('listening'); voiceStatus.textContent = t('voice.error'); voiceStatus.classList.add('visible'); voiceStatus.classList.remove('active'); setTimeout(() => voiceStatus.classList.remove('visible'), 2000); };
-    voiceBtn.addEventListener('click', () => { if (voiceBtn.classList.contains('unsupported')) return; if (isListening) recognition.stop(); else { recognition.lang = currentLang === 'es' ? 'es-ES' : 'en-US'; input.value = ''; try { recognition.start(); } catch(e) {} } });
-    window.recognition = recognition;
-  }
-  // 🎙️ Wake Word Polling & Auto-Activation
-  let wakeTriggered = false;
-  async function checkWakeStatus() {
-    try {
-      const res = await fetch('/wake/status');
-      const data = await res.json();
-      if (data.triggered && !wakeTriggered) {
-        wakeTriggered = true;
-        // Sonido sutil de activación
-        const ctx = new (window.AudioContext || window.webkitAudioContext)();
-        const osc = ctx.createOscillator();
-        const gain = ctx.createGain();
-        osc.connect(gain); gain.connect(ctx.destination);
-        osc.frequency.value = 880; gain.gain.value = 0.1;
-        osc.start(); gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.4);
-        osc.stop(ctx.currentTime + 0.4);
-        
-        // Activar micrófono automáticamente
-        document.getElementById('user-input').placeholder = '👂 Escuchando...';
-        document.getElementById('user-input').focus();
-        if (voiceBtn && !voiceBtn.classList.contains('listening')) {
-          voiceBtn.click(); // Activa el micrófono existente
-        }
-        setTimeout(() => wakeTriggered = false, 3000);
+  let recognition = null;
+  let isListening = false;
+
+  if (!SpeechRecognition) {
+    voiceBtn.classList.add('unsupported');
+    voiceBtn.title = 'Speech Recognition not supported';
+  } else {
+    recognition = new SpeechRecognition();
+    recognition.continuous = false;
+    recognition.interimResults = true;
+
+    recognition.onstart = () => {
+      isListening = true;
+      voiceBtn.classList.add('listening');
+      voiceStatus.textContent = t('voice.listening');
+      voiceStatus.classList.add('visible', 'active');
+    };
+
+    recognition.onresult = (e) => {
+      let interim = '';
+      let final = '';
+      for (let i = e.resultIndex; i < e.results.length; i++) {
+        const txt = e.results[i][0].transcript;
+        if (e.results[i].isFinal) final += txt;
+        else interim += txt;
       }
-    } catch {}
+      input.value = final || interim;
+    };
+
+    recognition.onend = () => {
+      isListening = false;
+      voiceBtn.classList.remove('listening');
+      voiceStatus.classList.remove('visible', 'active');
+      if (input.value.trim()) sendMessage();
+    };
+
+    recognition.onerror = (e) => {
+      isListening = false;
+      voiceBtn.classList.remove('listening');
+      voiceStatus.textContent = t('voice.error');
+      voiceStatus.classList.add('visible');
+      voiceStatus.classList.remove('active');
+      setTimeout(() => voiceStatus.classList.remove('visible'), 2000);
+    };
+
+    voiceBtn.addEventListener('click', () => {
+      if (voiceBtn.classList.contains('unsupported')) return;
+      if (isListening) {
+        recognition.stop();
+      } else {
+        recognition.lang = currentLang === 'es' ? 'es-ES' : 'en-US';
+        input.value = '';
+        try { recognition.start(); }
+        catch(e) { /* already started */ }
+      }
+    });
   }
-  setInterval(checkWakeStatus, 800);
-  
-  // ── Init ──────────────────────────────────────────────────────────
+
+  // Lang switcher with voice
+  window.setLangWithVoice = function(lang) {
+    currentLang = lang;
+    document.querySelectorAll('.lang-btn').forEach(b => b.classList.remove('active'));
+    document.querySelector(`.lang-btn[onclick*="'${lang}'"]`).classList.add('active');
+    applyLang();
+    if (recognition) recognition.lang = lang === 'es' ? 'es-ES' : 'en-US';
+  };
+
+  // Init
   applyLang();
 </script>
 </body>
