@@ -1,4 +1,4 @@
-export type ActionType = 'file_write' | 'cli_execute' | 'web_click' | 'api_call';
+export type ActionType = 'file_write' | 'cli_execute' | 'web_click' | 'api_call' | 'ui_interact' | 'web_navigate' | 'file_read';
 export type RiskLevel = 'low' | 'medium' | 'high';
 export type HITLDecision = 'allow' | 'deny' | 'allow_session';
 
