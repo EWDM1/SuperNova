@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SuperNova Control Indicator</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html, body { 
+      width: 100vw; 
+      height: 100vh; 
+      background: transparent; 
+      pointer-events: none; 
+      overflow: hidden;
+    }
+    #border {
+      position: fixed;
+      inset: 0;
+      border: 2px solid #00f3ff;
+      box-shadow: 0 0 12px 2px rgba(0, 243, 255, 0.35), inset 0 0 12px 2px rgba(0, 243, 255, 0.15);
+      opacity: 0;
+      transition: opacity 0.25s ease;
+      pointer-events: none;
+      z-index: 2147483647; /* Max Z */
+    }
+    #border.active { opacity: 1; }
+  </style>
+</head>
+<body>
+  <div id="border"></div>
+  <script>
+    // Expone métodos globales para control desde Tauri
+    window.__borderAPI = {
+      show: () => document.getElementById('border').classList.add('active'),
+      hide: () => document.getElementById('border').classList.remove('active')
+    };
+  </script>
+</body>
+</html>
