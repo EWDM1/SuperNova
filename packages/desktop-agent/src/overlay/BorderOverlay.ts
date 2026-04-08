@@ -10,14 +10,19 @@ export async function initBorderOverlay() {
   borderWindow = new WebviewWindow(OVERLAY_LABEL, {
     url: './src/overlay/border.html',
     title: 'SuperNova Active',
-    width: 1920, height: 1080,
-    decorations: false, transparent: true, alwaysOnTop: true,
-    skipTaskbar: true, focus: false, resizable: false, visible: false,
+    width: 1920,
+    height: 1080,
+    decorations: false,
+    transparent: true,
+    alwaysOnTop: true,
+    skipTaskbar: true,
+    focus: false,
+    resizable: false,
+    visible: false,
     acceptFirstMouse: true
   });
 
-  // Escuchar cambios de estado globales
-  await listen<{ state: OverlayState; context?: string }>('supernova:state-change', async ({ payload }) => {
+  await listen<{ state: OverlayState }>('supernova:state-change', async ({ payload }) => {
     if (!borderWindow) return;
     if (payload.state !== 'idle' && !(await borderWindow.isVisible())) {
       await borderWindow.show();
